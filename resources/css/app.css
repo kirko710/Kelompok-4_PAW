@@ -9,3 +9,429 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* ============================================
+   app.css — Courtee Global Stylesheet
+   ============================================ */
+
+/* --- 1. CSS Variables --- */
+:root {
+    --brand-primary:    #9957B3;
+    --brand-dark:       #4D2D6C;
+    --text-primary:     #344054;
+    --text-secondary:   #667085;
+    --text-white:       #FFFFFF;
+    --stroke-secondary: #EAECF0;
+    --stroke-blue:      #A2CAF4;
+    --fill-base:        #FFFFFF;
+    --shadow-card:      0px 3px 6px rgba(0, 0, 0, 0.25);
+    --font-base:        'Manrope', sans-serif;
+    --radius-sm:        8px;
+    --transition:       0.2s ease;
+}
+
+/* --- 2. Reset & Base --- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth;}
+
+body {
+    font-family: var(--font-base);
+    color: var(--text-primary);
+    background-color: var(--fill-base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+ul { list-style: none; }
+
+/* --- 3. Container --- */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar {
+    width: 100%;
+    background: var(--fill-base);
+    border-bottom: 3px solid rgba(0, 0, 0, 0.75);
+    position: sticky;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar__inner {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navbar__logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar__logo img {
+    width: 115px;
+    height: 115px;
+    object-fit: contain;
+    margin-right: -40px;
+}
+
+.navbar__logo-text {
+    color: var(--brand-dark);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    margin-bottom: 20px;
+}
+
+.navbar__menu {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-link {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    transition: color var(--transition);
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--brand-primary);
+}
+
+.navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-base);
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity var(--transition);
+    border: none;
+}
+
+.btn:hover { opacity: 0.85; }
+
+.btn--primary {
+    padding: 8px 12px;
+    background: var(--brand-primary);
+    color: var(--text-white);
+    font-size: 14px;
+}
+
+.btn--outline {
+    padding: 10px 16px;
+    background: var(--fill-base);
+    color: var(--text-primary);
+    font-size: 16px;
+    border: 1px solid var(--stroke-secondary);
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 609px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero__bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--brand-primary);
+    opacity: 0.70;
+}
+
+.hero__content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 559px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 24px;
+}
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--fill-base);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--stroke-secondary);
+    font-size: 16px;
+    font-family: var(--font-base);
+    font-weight: 400;
+    color: var(--text-secondary);
+    outline: none;
+    transition: border-color var(--transition);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: var(--brand-primary);
+    color: var(--text-primary);
+}
+
+.form-select-wrapper {
+    position: relative;
+}
+
+.form-select-wrapper .chevron-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* ============================================
+   SECTION VENUE
+   ============================================ */
+.section-venue {
+    padding: 48px 24px;
+}
+
+.section-venue__title {
+    color: var(--brand-primary);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 44px;
+    margin-bottom: 32px;
+}
+
+.venue-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+/* ============================================
+   VENUE CARD
+   ============================================ */
+.venue-card {
+    width: 349px;
+    background: var(--fill-base);
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--stroke-blue);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.venue-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.venue-card__image {
+    width: 100%;
+    height: 349px;
+    object-fit: cover;
+}
+
+.venue-card__body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.venue-card__name {
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
+    transition: color var(--transition);
+}
+
+.venue-card__name:hover { color: var(--brand-primary); }
+
+.venue-card__meta {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+}
+
+.venue-card__price {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+}
+
+.venue-card__schedules {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.schedule-badge {
+    display: inline-flex;
+    padding: 8px 12px;
+    background: var(--fill-base);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--stroke-secondary);
+    opacity: 0.8;
+    width: fit-content;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+    padding: 64px 24px;
+    background: var(--fill-base);
+    border-top: 1px solid var(--stroke-secondary);
+    display: flex;
+    justify-content: center;
+}
+
+.footer__inner {
+    width: 100%;
+    max-width: 1200px;
+    opacity: 0.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+.footer__socials {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.footer__socials a {
+    transition: opacity var(--transition);
+}
+
+.footer__socials a:hover { opacity: 0.6; }
+
+.footer__copy {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* ============================================
+   AUTH LAYOUT
+   ============================================ */
+.auth-body {
+    background: var(--fill-base);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-container {
+    display: flex;
+    width: 100%;
+    max-width: 960px;
+    min-height: 100vh;
+}
+
+.auth-side {
+    flex: 1;
+    background: var(--brand-primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 48px;
+    gap: 24px;
+}
+
+.auth-side .navbar__logo-text { color: var(--text-white); }
+
+.auth-side__tagline {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 320px;
+}
+
+.auth-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .navbar__menu  { display: none; }
+
+    .hero          { height: auto; padding: 60px 0; }
+
+    .section-venue__title { font-size: 28px; }
+
+    .venue-grid    { justify-content: center; }
+
+    .venue-card    { width: 100%; max-width: 420px; }
+
+    .auth-side     { display: none; }
+
+    .auth-container { flex-direction: column; }
+}
