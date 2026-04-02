@@ -40,4 +40,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/pembatalan', function () { return view('admin.pembatalan'); })->name('pembatalan');
     Route::get('/laporan', function () { return view('admin.laporan'); })->name('laporan');
     Route::get('/komunikasi', function () { return view('admin.komunikasi'); })->name('komunikasi');
+    Route::get('/profile', function () { return view('admin.profile'); })->name('profile');
 });
