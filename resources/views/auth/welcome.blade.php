@@ -31,10 +31,10 @@
     <div class="bg-white rounded-3xl shadow-lg w-full max-w-lg p-10 text-center">
         {{-- Logo --}}
         <div class="flex items-center justify-center gap-1 mb-6">
-            <div class="w-10 h-10 bg-courtee-700 rounded-full flex items-center justify-center">
-                <span class="text-white text-lg font-bold">C</span>
+            <div class="flex items-center">
+                
             </div>
-            <span class="text-2xl font-bold text-courtee-800">ourtee</span>
+            <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-7"><span class="text-2xl font-bold text-courtee-800">ourtee</span>
         </div>
 
         <p class="text-courtee-600 text-sm font-medium">Anda telah terdaftar!</p>

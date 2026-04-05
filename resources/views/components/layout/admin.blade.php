@@ -54,7 +54,7 @@
                     @endphp
 
                     @foreach($menuItems as $item)
-                        <a href="#"
+                        <a href="{{ route($item['route']) ? route($item['route']) : '#' }}"
                            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition
                            {{ ($activeMenu ?? '') === $item['route'] ? 'bg-white/20 text-white shadow-lg' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -68,10 +68,10 @@
 
             {{-- Bottom Actions --}}
             <div class="p-6 space-y-2">
-                <a href="#" class="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-courtee-400/30 hover:bg-courtee-400/50 transition">
+                <a href="{{ route($item['route']) }}" class="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-courtee-400/30 hover:bg-courtee-400/50 transition">
                     Profile
                 </a>
-                <a href="#" class="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-red-500/80 hover:bg-red-500 transition">
+                <a href="{{ route($item['route']) }}" class="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-red-500/80 hover:bg-red-500 transition">
                     Logout
                 </a>
             </div>
