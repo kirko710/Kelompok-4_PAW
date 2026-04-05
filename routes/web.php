@@ -7,7 +7,7 @@ Route::get('/', function () { return view('home.index'); })->name('home');
 
 // ============ AUTH - LOGIN & REGISTER (kirko) ============
 Route::get('/login', function () { return view('auth.login'); })->name('login');
-Route::post('/login/penyewa', function () { return redirect('/'); })->name('login.penyewa');
+Route::post('/login/penyewa', function () { return redirect('/venue'); })->name('login.penyewa');
 Route::post('/login/owner', function () { return redirect('/admin'); })->name('login.owner');
 Route::get('/register', function () { return view('auth.register'); })->name('register');
 Route::get('/register/user', function () { return view('auth.register-form'); })->name('register.user');
