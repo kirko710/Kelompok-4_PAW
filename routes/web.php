@@ -46,7 +46,30 @@ Route::prefix('community')->name('community.')->group(function () {
     Route::get('/event', function () { return view('community.event'); })->name('event');
 });
 
-// Placeholder admin routes (belum ada view)
-Route::get('/admin/pembatalan', function () { return 'Halaman Pembatalan - Coming Soon'; })->name('admin.pembatalan');
-Route::get('/admin/laporan', function () { return 'Halaman Laporan - Coming Soon'; })->name('admin.laporan');
-Route::get('/admin/komunikasi', function () { return 'Halaman Komunikasi - Coming Soon'; })->name('admin.komunikasi');
+// ============ AUTH PAGES ============
+Route::get('/login', function () { return view('auth.login'); })->name('login');
+Route::get('/register', function () { return view('auth.register'); })->name('register');
+Route::get('/register/user', function () { return view('auth.register-form'); })->name('register.user');
+Route::get('/register/owner', function () { return view('auth.register-form'); })->name('register.owner');
+Route::get('/register/profile/user', function () { return view('auth.register-profile-user'); })->name('register.profile.user');
+Route::get('/register/profile/owner', function () { return view('auth.register-profile-owner'); })->name('register.profile.owner');
+Route::get('/register/preferensi', function () { return view('auth.register-preferensi'); })->name('register.preferensi');
+Route::get('/register/welcome', function () { return view('auth.welcome'); })->name('register.welcome');
+
+// ============ ADMIN PAGES ============
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () { return view('admin.dashboard'); })->name('dashboard');
+    Route::get('/venue', function () { return view('admin.venue'); })->name('venue');
+    Route::get('/venue/create', function () { return view('admin.venue-create'); })->name('venue.create');
+    Route::get('/venue/show', function () { return view('admin.venue-show'); })->name('venue.show');
+    Route::get('/lapangan', function () { return view('admin.lapangan'); })->name('lapangan');
+    Route::get('/lapangan/create', function () { return view('admin.lapangan-create'); })->name('lapangan.create');
+    Route::get('/lapangan/show', function () { return view('admin.lapangan-show'); })->name('lapangan.show');
+    Route::get('/jadwal', function () { return view('admin.jadwal'); })->name('jadwal');
+    Route::get('/pemesanan', function () { return view('admin.pemesanan'); })->name('pemesanan');
+    Route::get('/verifikasi', function () { return view('admin.verifikasi'); })->name('verifikasi');
+    Route::get('/pembatalan', function () { return view('admin.pembatalan'); })->name('pembatalan');
+    Route::get('/laporan', function () { return view('admin.laporan'); })->name('laporan');
+    Route::get('/komunikasi', function () { return view('admin.komunikasi'); })->name('komunikasi');
+    Route::get('/profile', function () { return view('admin.profile'); })->name('profile');
+});
