@@ -33,7 +33,11 @@ Route::get('/register/welcome', function () { return view('auth.welcome'); })->n
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () { return view('admin.dashboard'); })->name('dashboard');
     Route::get('/venue', function () { return view('admin.venue'); })->name('venue');
+    Route::get('/venue/create', function () { return view('admin.venue-create'); })->name('venue.create');
+    Route::get('/venue/show', function () { return view('admin.venue-show'); })->name('venue.show');
     Route::get('/lapangan', function () { return view('admin.lapangan'); })->name('lapangan');
+    Route::get('/lapangan/create', function () { return view('admin.lapangan-create'); })->name('lapangan.create');
+    Route::get('/lapangan/show', function () { return view('admin.lapangan-show'); })->name('lapangan.show');
     Route::get('/jadwal', function () { return view('admin.jadwal'); })->name('jadwal');
     Route::get('/pemesanan', function () { return view('admin.pemesanan'); })->name('pemesanan');
     Route::get('/verifikasi', function () { return view('admin.verifikasi'); })->name('verifikasi');
