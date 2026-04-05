@@ -42,17 +42,17 @@
             {{-- Logo --}}
             <div class="flex items-center justify-center gap-3 mb-10">
                 <div class="flex items-center gap-1">
-                    <div class="w-10 h-10 bg-courtee-700 rounded-full flex items-center justify-center">
-                        <span class="text-white text-lg font-bold">C</span>
+                    <div class="flex items-center">
+                        
                     </div>
-                    <span class="text-2xl font-bold text-courtee-800">ourtee</span>
+                    <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-7"><span class="text-2xl font-bold text-courtee-800">ourtee</span>
                 </div>
                 <div class="w-px h-8 bg-gray-300"></div>
                 <h1 class="text-2xl font-bold text-courtee-700">Login</h1>
             </div>
 
             {{-- Form --}}
-            <form action="#" method="POST" class="space-y-6">
+	<div class="space-y-6">
                 <div>
                     <label class="text-sm text-gray-500 mb-1 block">Email</label>
                     <input type="email" placeholder="johndoe@gmail.com"
@@ -70,16 +70,21 @@
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <button type="submit"
+                  <form action="/login/penyewa" method="POST" class="flex-1">
+		       @csrf
+		     <button type="submit"
                         class="flex-1 bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
                         Login sebagai Penyewa
-                    </button>
-                    <button type="submit"
+                     </button>
+                 </form>
+		<form action="/login/owner" method="POST" class="flex-1">
+                   @csrf
+		    <button type="submit"
                         class="flex-1 border-2 border-gray-200 text-gray-700 py-3.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition">
                         Login sebagai Owner
                     </button>
+		</form>
                 </div>
-            </form>
         </div>
     </div>
 </body>

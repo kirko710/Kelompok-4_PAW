@@ -32,10 +32,10 @@
         {{-- Logo --}}
         <div class="flex items-center justify-center gap-3 mb-10">
             <div class="flex items-center gap-1">
-                <div class="w-10 h-10 bg-courtee-700 rounded-full flex items-center justify-center">
-                    <span class="text-white text-lg font-bold">C</span>
+                <div class="flex items-center">
+                    
                 </div>
-                <span class="text-2xl font-bold text-courtee-800">ourtee</span>
+                <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-7"><span class="text-2xl font-bold text-courtee-800">ourtee</span>
             </div>
             <div class="w-px h-8 bg-gray-300"></div>
             <h1 class="text-2xl font-bold text-courtee-700">Register</h1>
