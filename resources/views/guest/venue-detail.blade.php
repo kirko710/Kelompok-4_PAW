@@ -113,7 +113,7 @@
         </div>
         @endforeach
 
-        <a href="/pemesanan"><button class="btn-cta">Lanjutkan ke Pembayaran</button></a>
+        <a href="/detail-pemesanan"><button class="btn-cta">Lanjutkan ke Pembayaran</button></a>
     </div>
 </div>
 @endsection

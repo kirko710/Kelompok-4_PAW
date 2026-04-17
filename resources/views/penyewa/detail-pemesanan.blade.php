@@ -1,4 +1,4 @@
-@extends('layout.layout')
+@extends('layouts.layout')
 @section('title', 'Detail Pemesanan - Courtee')
 
 @push('styles')

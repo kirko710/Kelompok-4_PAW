@@ -37,9 +37,10 @@ Route::prefix('register')->name('register.')->group(function () {
 Route::get('/venue', fn () => view('guest.venue-search'))->name('venue.index');
 Route::get('/venue/{id}', fn ($id) => view('guest.venue-detail'))->name('venue.show');
 
-// Route::get('/detail-pemesanan', fn () => view('guest.detail-pemesanan'))->name('pemesanan.detail');
-// Route::get('/pembayaran', fn () => view('guest.pembayaran'))->name('pembayaran');
-// Route::get('/profile', fn () => view('guest.profile'))->name('user.profile');
+// ============= Penyewa =============
+Route::get('/detail-pemesanan', fn () => view('penyewa.detail-pemesanan'))->name('pemesanan.detail');
+Route::get('/pembayaran', fn () => view('penyewa.pembayaran'))->name('pembayaran');
+Route::get('/profile', fn () => view('penyewa.profile'))->name('user.profile');
 
 // ============ ADMIN ============
 Route::prefix('admin')->name('admin.')->group(function () {
