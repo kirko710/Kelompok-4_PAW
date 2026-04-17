@@ -27,8 +27,6 @@
     <style>* { font-family: 'Poppins', sans-serif; }</style>
 </head>
 <body class="bg-courtee-100/40 min-h-screen flex flex-col">
-
-    {{-- Back Button --}}
     <div class="p-6">
         <a href="/" class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm text-sm text-gray-600 hover:bg-gray-50 transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
@@ -36,32 +34,45 @@
         </a>
     </div>
 
-    {{-- Login Card --}}
     <div class="flex-1 flex items-center justify-center px-6 pb-16">
         <div class="bg-white rounded-3xl shadow-lg w-full max-w-lg p-10">
-            {{-- Logo --}}
             <div class="flex items-center justify-center gap-3 mb-10">
-                <div class="flex items-center gap-1">
-                    <div class="flex items-center">
-                        
-                    </div>
-                    <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-7"><span class="text-2xl font-bold text-courtee-800">ourtee</span>
+                <div class="flex items-center">
+                    <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-5">
+                    <span class="text-2xl font-bold text-courtee-800">ourtee</span>
                 </div>
                 <div class="w-px h-8 bg-gray-300"></div>
                 <h1 class="text-2xl font-bold text-courtee-700">Login</h1>
             </div>
 
-            {{-- Form --}}
-	<div class="space-y-6">
+            {{-- Error Message --}}
+            @if(session('error'))
+                <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm text-center mb-6">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            {{-- Validation Errors --}}
+            @if($errors->any())
+                <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+                    <ul class="list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="space-y-6">
                 <div>
                     <label class="text-sm text-gray-500 mb-1 block">Email</label>
-                    <input type="email" placeholder="johndoe@gmail.com"
+                    <input type="email" name="email" id="email" placeholder="johndoe@gmail.com" value="{{ old('email') }}"
                         class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
                 </div>
 
                 <div>
                     <label class="text-sm text-gray-500 mb-1 block">Password</label>
-                    <input type="password" placeholder="**********"
+                    <input type="password" name="password" id="password" placeholder="**********"
                         class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
                 </div>
 
@@ -70,22 +81,36 @@
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                  <form action="/login/penyewa" method="POST" class="flex-1">
-		       @csrf
-		     <button type="submit"
-                        class="flex-1 bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
-                        Login sebagai Penyewa
-                     </button>
-                 </form>
-		<form action="/login/owner" method="POST" class="flex-1">
-                   @csrf
-		    <button type="submit"
-                        class="flex-1 border-2 border-gray-200 text-gray-700 py-3.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition">
-                        Login sebagai Owner
-                    </button>
-		</form>
+                    <form action="/login/penyewa" method="POST" class="flex-1">
+                        @csrf
+                        <input type="hidden" name="email" id="email_penyewa">
+                        <input type="hidden" name="password" id="password_penyewa">
+                        <button type="submit" onclick="copyFields('penyewa')"
+                            class="w-full bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
+                            Login sebagai Penyewa
+                        </button>
+                    </form>
+                    <form action="/login/owner" method="POST" class="flex-1">
+                        @csrf
+                        <input type="hidden" name="email" id="email_owner">
+                        <input type="hidden" name="password" id="password_owner">
+                        <button type="submit" onclick="copyFields('owner')"
+                            class="w-full border-2 border-gray-200 text-gray-700 py-3.5 rounded-xl font-semibold text-sm hover:bg-gray-50 transition">
+                            Login sebagai Owner
+                        </button>
+                    </form>
                 </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        function copyFields(role) {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            document.getElementById('email_' + role).value = email;
+            document.getElementById('password_' + role).value = password;
+        }
+    </script>
 </body>
 </html>

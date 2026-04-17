@@ -42,8 +42,9 @@
 
         <h2 class="text-xl font-semibold text-gray-800 text-center mb-8">Setelan Preferensi</h2>
 
-        <form action="#" method="POST" class="space-y-6">
-            <div>
+        <form action="/register/preferensi/save" method="POST" class="space-y-6">
+            @csrf
+	     <div>
                 <label class="text-sm text-gray-500 mb-1 block">Olahraga Favorit</label>
                 <select class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition appearance-none bg-white">
                     <option>Pilih olahraga favorit anda (multiseleksi)</option>

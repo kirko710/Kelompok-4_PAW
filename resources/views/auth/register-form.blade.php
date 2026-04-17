@@ -27,42 +27,52 @@
     <style>* { font-family: 'Poppins', sans-serif; }</style>
 </head>
 <body class="bg-courtee-100/40 min-h-screen flex items-center justify-center px-6 py-12">
-
     <div class="bg-white rounded-3xl shadow-lg w-full max-w-lg p-10">
-        {{-- Logo --}}
         <div class="flex items-center justify-center gap-3 mb-10">
-            <div class="flex items-center gap-1">
-                <div class="flex items-center">
-                    
-                </div>
-                <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-7"><span class="text-2xl font-bold text-courtee-800">ourtee</span>
+            <div class="flex items-center">
+                <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-5">
+                <span class="text-2xl font-bold text-courtee-800">ourtee</span>
             </div>
             <div class="w-px h-8 bg-gray-300"></div>
             <h1 class="text-2xl font-bold text-courtee-700">Register</h1>
         </div>
 
-        <form action="#" method="POST" class="space-y-6">
+        {{-- Validation Errors --}}
+        @if($errors->any())
+            <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="/register/submit" method="POST" class="space-y-6">
+            @csrf
+            <input type="hidden" name="role" value="{{ $role ?? 'user' }}">
+
             <div>
-                <label class="text-sm text-gray-500 mb-1 block">Email</label>
-                <input type="email" placeholder="johndoe@gmail.com"
+                <label class="text-sm text-gray-500 mb-1 block">Nama Lengkap</label>
+                <input type="text" name="name" placeholder="John Doe" value="{{ old('name') }}"
                     class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
             </div>
 
             <div>
-                <label class="text-sm text-gray-500 mb-1 block">Username</label>
-                <input type="text" placeholder="JohnDoe67"
+                <label class="text-sm text-gray-500 mb-1 block">Email</label>
+                <input type="email" name="email" placeholder="johndoe@gmail.com" value="{{ old('email') }}"
                     class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
             </div>
 
             <div>
                 <label class="text-sm text-gray-500 mb-1 block">Password</label>
-                <input type="password" placeholder="**********"
+                <input type="password" name="password" placeholder="**********"
                     class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
             </div>
 
             <div>
                 <label class="text-sm text-gray-500 mb-1 block">Ulangi Password</label>
-                <input type="password" placeholder="**********"
+                <input type="password" name="password_confirmation" placeholder="**********"
                     class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
             </div>
 

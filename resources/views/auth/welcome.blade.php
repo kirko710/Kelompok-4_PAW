@@ -27,63 +27,40 @@
     <style>* { font-family: 'Poppins', sans-serif; }</style>
 </head>
 <body class="bg-courtee-100/40 min-h-screen flex items-center justify-center px-6 py-12">
-
     <div class="bg-white rounded-3xl shadow-lg w-full max-w-lg p-10 text-center">
-        {{-- Logo --}}
         <div class="flex items-center justify-center gap-1 mb-6">
-            <div class="flex items-center">
-                
-            </div>
-            <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-7"><span class="text-2xl font-bold text-courtee-800">ourtee</span>
+            <img src="/assets/logo.png" alt="Courtee" class="h-24 -mr-5">
+            <span class="text-2xl font-bold text-courtee-800">ourtee</span>
         </div>
+
+        @if(session('success'))
+            <div class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-xl text-sm mb-6">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <p class="text-courtee-600 text-sm font-medium">Anda telah terdaftar!</p>
-        <h1 class="text-3xl font-bold text-gray-800 mt-2 mb-8">Selamat Datang di Courtee!</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mt-2 mb-4">Selamat Datang di Courtee!</h1>
 
-        {{-- Welcome Illustration --}}
+        @auth
+            <p class="text-gray-500 mb-8">Halo, <strong>{{ Auth::user()->name }}</strong>! Akun kamu sudah siap.</p>
+        @endauth
+
         <div class="bg-courtee-50 rounded-2xl p-8 mb-8">
-            <div class="flex justify-center items-end gap-2">
-                {{-- Simple SVG people illustration --}}
-                <svg viewBox="0 0 400 250" class="w-full max-w-sm" xmlns="http://www.w3.org/2000/svg">
-                    {{-- Speech bubble --}}
-                    <rect x="130" y="10" width="140" height="40" rx="20" fill="#e9d5ff" stroke="#c084fc" stroke-width="1.5"/>
-                    <text x="200" y="36" text-anchor="middle" fill="#7e22ce" font-weight="bold" font-size="14" font-family="Poppins">WELCOME</text>
-                    <polygon points="190,50 200,60 210,50" fill="#e9d5ff"/>
-
-                    {{-- Person 1 --}}
-                    <circle cx="80" cy="100" r="20" fill="#f97316"/>
-                    <rect x="60" y="125" width="40" height="60" rx="10" fill="#f97316"/>
-                    <rect x="60" y="185" width="15" height="50" rx="5" fill="#3b82f6"/>
-                    <rect x="85" y="185" width="15" height="50" rx="5" fill="#3b82f6"/>
-
-                    {{-- Person 2 --}}
-                    <circle cx="160" cy="90" r="22" fill="#9ca3af"/>
-                    <rect x="138" y="117" width="44" height="65" rx="10" fill="#d1d5db"/>
-                    <rect x="138" y="182" width="17" height="55" rx="5" fill="#4b5563"/>
-                    <rect x="165" y="182" width="17" height="55" rx="5" fill="#4b5563"/>
-
-                    {{-- Person 3 --}}
-                    <circle cx="240" cy="90" r="22" fill="#6366f1"/>
-                    <rect x="218" y="117" width="44" height="65" rx="10" fill="#818cf8"/>
-                    <rect x="218" y="182" width="17" height="55" rx="5" fill="#312e81"/>
-                    <rect x="245" y="182" width="17" height="55" rx="5" fill="#312e81"/>
-
-                    {{-- Person 4 --}}
-                    <circle cx="320" cy="100" r="20" fill="#ef4444"/>
-                    <rect x="300" y="125" width="40" height="60" rx="10" fill="#f87171"/>
-                    <rect x="300" y="185" width="15" height="50" rx="5" fill="#1e3a5f"/>
-                    <rect x="325" y="185" width="15" height="50" rx="5" fill="#1e3a5f"/>
-
-                    {{-- Waving hands --}}
-                    <line x1="55" y1="130" x2="30" y2="90" stroke="#f97316" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="345" y1="130" x2="370" y2="90" stroke="#f87171" stroke-width="6" stroke-linecap="round"/>
-                </svg>
-            </div>
+            <svg viewBox="0 0 400 200" class="w-full max-w-sm mx-auto" xmlns="http://www.w3.org/2000/svg">
+                <rect x="130" y="10" width="140" height="40" rx="20" fill="#e9d5ff" stroke="#c084fc" stroke-width="1.5"/>
+                <text x="200" y="36" text-anchor="middle" fill="#7e22ce" font-weight="bold" font-size="14" font-family="Poppins">WELCOME</text>
+                <circle cx="100" cy="100" r="20" fill="#f97316"/>
+                <rect x="80" y="125" width="40" height="50" rx="10" fill="#f97316"/>
+                <circle cx="200" cy="90" r="22" fill="#6366f1"/>
+                <rect x="178" y="117" width="44" height="55" rx="10" fill="#818cf8"/>
+                <circle cx="300" cy="100" r="20" fill="#ef4444"/>
+                <rect x="280" y="125" width="40" height="50" rx="10" fill="#f87171"/>
+            </svg>
         </div>
 
-        <a href="/"
-            class="block w-full bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
-            Lanjutkan <span class="ml-1">&rarr;</span>
+        <a href="/" class="block w-full bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
+            Lanjutkan &rarr;
         </a>
     </div>
 </body>
