@@ -49,7 +49,8 @@
             </button>
         </div>
 
-        <form action="#" method="POST" class="space-y-5">
+        <form action="{{ route('register.profile.owner.post') }}" method="POST" class="space-y-5">
+            @csrf
             <div>
                 <label class="text-sm text-gray-500 mb-1 block">Nama Lengkap</label>
                 <input type="text" placeholder="johndoe@gmail.com"

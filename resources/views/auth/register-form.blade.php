@@ -41,22 +41,23 @@
             <h1 class="text-2xl font-bold text-courtee-700">Register</h1>
         </div>
 
-        <form action="#" method="POST" class="space-y-6">
+        <form action="{{ route('register.' . $role . '.post') }}" method="POST" class="space-y-6">
+            @csrf
             <div>
                 <label class="text-sm text-gray-500 mb-1 block">Email</label>
-                <input type="email" placeholder="johndoe@gmail.com"
+                <input type="email" name="email" placeholder="johndoe@gmail.com"
                     class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
             </div>
 
             <div>
                 <label class="text-sm text-gray-500 mb-1 block">Username</label>
-                <input type="text" placeholder="JohnDoe67"
+                <input type="text" name="username" placeholder="JohnDoe67"
                     class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
             </div>
 
             <div>
                 <label class="text-sm text-gray-500 mb-1 block">Password</label>
-                <input type="password" placeholder="**********"
+                <input type="password" name="password" placeholder="**********"
                     class="w-full border border-gray-200 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-courtee-400 transition">
             </div>
 
