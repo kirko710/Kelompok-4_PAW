@@ -20,7 +20,7 @@ Route::prefix('register')->name('register.')->group(function () {
 
     Route::get('/owner', fn () => view('auth.register-form', ['role' => 'owner']))->name('owner');
     Route::post('/owner', fn () => redirect('/register/profile/owner'))->name('owner.post');
-    
+
     Route::get('/profile/user',  fn () => view('auth.register-profile-user'))->name('profile.user');
     Route::post('/profile/user', fn () => redirect('/register/preferensi'))->name('profile.user.post');
 
@@ -34,8 +34,8 @@ Route::prefix('register')->name('register.')->group(function () {
 });
 
 // ============ VENUE (Guest) ============
-Route::get('/venue', fn () => view('guest.venue-search'))->name('venue.index');
-Route::get('/venue/{id}', fn ($id) => view('guest.venue-detail'))->name('venue.show');
+Route::get('/venue', [App\Http\Controllers\GuestController::class, 'index'])->name('venue.index');
+Route::get('/venue/{id}', [App\Http\Controllers\GuestController::class, 'show'])->name('venue.show');
 
 // ============= Penyewa =============
 Route::get('/detail-pemesanan', fn () => view('penyewa.detail-pemesanan'))->name('pemesanan.detail');
@@ -45,12 +45,19 @@ Route::get('/profile', fn () => view('penyewa.profile'))->name('user.profile');
 // ============ ADMIN ============
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
-    Route::get('/venue', fn () => view('admin.venue'))->name('venue');
-    Route::get('/venue/create', fn () => view('admin.venue-create'))->name('venue.create');
+
+    // Venue
+    Route::get('/venue', [App\Http\Controllers\VenueController::class, 'index'])->name('venue');
+    Route::get('/venue/create', [App\Http\Controllers\VenueController::class, 'create'])->name('venue.create');
+    Route::post('/venue', [App\Http\Controllers\VenueController::class, 'store'])->name('venue.store');
     Route::get('/venue/show', fn () => view('admin.venue-show'))->name('venue.show');
-    Route::get('/lapangan', fn () => view('admin.lapangan'))->name('lapangan');
-    Route::get('/lapangan/create', fn () => view('admin.lapangan-create'))->name('lapangan.create');
+
+    // Lapangan
+    Route::get('/lapangan', [App\Http\Controllers\LapanganController::class, 'index'])->name('lapangan');
+    Route::get('/lapangan/create', [App\Http\Controllers\LapanganController::class, 'create'])->name('lapangan.create');
+    Route::post('/lapangan', [App\Http\Controllers\LapanganController::class, 'store'])->name('lapangan.store');
     Route::get('/lapangan/show', fn () => view('admin.lapangan-show'))->name('lapangan.show');
+
     Route::get('/jadwal', fn () => view('admin.jadwal'))->name('jadwal');
     Route::get('/pemesanan', fn () => view('admin.pemesanan'))->name('pemesanan');
     Route::get('/verifikasi', fn () => view('admin.verifikasi'))->name('verifikasi');

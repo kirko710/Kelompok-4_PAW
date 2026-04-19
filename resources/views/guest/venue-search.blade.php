@@ -113,34 +113,24 @@
 
 <div class="container">
     <div class="venue-results">
-        @php
-            $venues = [
-                ['name' => 'Longfield Sport Centre', 'type' => 'Lapangan Mini Soccer', 'location' => 'Jakarta Selatan', 'date' => 'Sabtu, 25-9-2022'],
-                ['name' => 'Sigmoid Badminton', 'type' => 'Lapangan Badminton', 'location' => 'Tangerang Selatan', 'date' => 'Sabtu, 25-9-2022'],
-                ['name' => 'Culture Padel', 'type' => 'Lapangan Padel', 'location' => 'Tangerang Selatan', 'date' => 'Sabtu, 25-9-2022'],
-                ['name' => 'Bikasoga Swimming', 'type' => 'Kolam Renang', 'location' => 'Bandung', 'date' => 'Sabtu, 25-9-2022'],
-            ];
-            $slots = ['07.00-08.00','08.00-09.00','10.00-11.00','13.00-14.00','14.00-15.00'];
-        @endphp
-
-        @foreach($venues as $v)
+        @forelse($venues as $venue)
         <div class="venue-result-card">
-            <div class="venue-result-card__name">{{ $v['name'] }}</div>
+            <div class="venue-result-card__name">{{ $venue['nama'] }}</div>
             <div class="venue-result-card__meta">
-                {{ $v['type'] }}<br>
-                {{ $v['location'] }}<br>
-                {{ $v['date'] }}
-            </div>
-            <div class="venue-result-card__slots">
-                @foreach($slots as $slot)
-                    <span class="slot-badge">{{ $slot }}</span>
-                @endforeach
+                {{ $venue['lokasi'] }}<br>
+                @if($venue['deskripsi'])
+                    {{ Str::limit($venue['deskripsi'], 80) }}
+                @endif
             </div>
             <div style="margin-top: 20px; text-align: right;">
-                <a href="/venue/1" class="btn btn--primary" style="padding: 10px 24px;">Check Details</a>
+                <a href="{{ route('venue.show', $venue['id']) }}" class="btn btn--primary" style="padding: 10px 24px;">Check Details</a>
             </div>
         </div>
-        @endforeach
+        @empty
+        <div style="grid-column: span 2; text-align: center; padding: 60px 0; color: #999;">
+            Belum ada venue yang tersedia saat ini.
+        </div>
+        @endforelse
     </div>
 </div>
 @endsection

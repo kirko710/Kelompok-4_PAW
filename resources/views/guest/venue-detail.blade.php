@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('title', 'Venue Detail - Courtee')
+@section('title', '{{ $venue["nama"] ?? "Venue Detail" }} - Courtee')
 
 @push('styles')
 <style>
@@ -55,13 +55,13 @@
 
 @section('content')
 <div class="venue-hero">
-    <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=1400&q=80" alt="Venue">
+    <img src="{{ $venue['foto'] ?? 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=1400&q=80' }}" alt="{{ $venue['nama'] }}">
 </div>
 
 <div class="container">
     <div class="venue-info">
-        <h1 class="venue-info__name">Longfield Sport Center</h1>
-        <p class="venue-info__location">Jakarta Pusat</p>
+        <h1 class="venue-info__name">{{ $venue['nama'] }}</h1>
+        <p class="venue-info__location">{{ $venue['lokasi'] }}</p>
         <div class="venue-socials">
             <a href="#" class="venue-social-icon"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg></a>
             <a href="#" class="venue-social-icon"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
@@ -77,10 +77,6 @@
         <h2 style="font-size: 22px; font-weight: 700; margin-top: 40px; margin-bottom: 24px;">Lapangan yang Tersedia</h2>
 
         @php
-            $courts = [
-                ['name' => 'Lapangan Sejahtera', 'desc' => 'Lapangan rumput sintetis berkualitas dengan penerangan malam, gawang standar, dan area bersih. Cocok untuk latihan, pertandingan persahabatan, serta kegiatan komunitas.', 'img' => 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&q=80'],
-                ['name' => 'Lapangan Makmur', 'desc' => 'Lapangan rumput sintetis berkualitas dengan penerangan malam, gawang standar, dan area bersih. Cocok untuk latihan dan pertandingan.', 'img' => 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600&q=80'],
-            ];
             $timeSlots = [
                 ['time' => '06.00-07.00', 'price' => 'Rp 24.000,00', 'available' => true],
                 ['time' => '07.00-08.00', 'price' => 'Rp 24.000,00', 'available' => true],
@@ -93,14 +89,19 @@
             ];
         @endphp
 
-        @foreach($courts as $court)
+        @forelse($lapangan as $court)
         <div class="court-card">
             <div class="court-card__image">
-                <img src="{{ $court['img'] }}" alt="{{ $court['name'] }}">
+                <img src="{{ $court['foto'] ?? 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&q=80' }}" alt="{{ $court['nama'] }}">
             </div>
             <div class="court-card__body">
-                <h3 class="court-card__name">{{ $court['name'] }}</h3>
-                <p class="court-card__desc">{{ $court['desc'] }}</p>
+                <h3 class="court-card__name">{{ $court['nama'] }}</h3>
+                <p class="court-card__desc">
+                    {{ $court['jenis_olahraga'] }}
+                    @if($court['harga'])
+                        &mdash; {{ $court['harga'] }} / jam
+                    @endif
+                </p>
                 <div class="court-slots">
                     @foreach($timeSlots as $slot)
                         <div class="court-slot {{ $slot['available'] ? 'court-slot--available' : 'court-slot--unavailable' }}">
@@ -111,7 +112,9 @@
                 </div>
             </div>
         </div>
-        @endforeach
+        @empty
+        <p style="color: #999; text-align: center; padding: 40px 0;">Belum ada lapangan tersedia untuk venue ini.</p>
+        @endforelse
 
         <a href="/detail-pemesanan"><button class="btn-cta">Lanjutkan ke Pembayaran</button></a>
     </div>
