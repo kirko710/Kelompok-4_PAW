@@ -58,10 +58,16 @@
                 <rect x="280" y="125" width="40" height="50" rx="10" fill="#f87171"/>
             </svg>
         </div>
-
-        <a href="/" class="block w-full bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
-            Lanjutkan &rarr;
-        </a>
+	
+        @if(session('registered_role') === 'owner')
+            <a href="/admin" class="block w-full bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
+                Masuk ke Dashboard Pengelola &rarr;
+            </a>
+        @else
+           <a href="/" class="block w-full bg-courtee-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-courtee-600 transition shadow-md">
+                Lanjutkan &rarr;
+           </a>
+	@endif
     </div>
 </body>
 </html>

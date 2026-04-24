@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Tampilkan halaman login
+    // ==================== LOGIN ====================
+
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    // Proses login
     public function login(Request $request)
     {
         $request->validate([
@@ -32,7 +32,6 @@ class AuthController extends Controller
         $role = $request->input('role', 'user');
 
         if (Auth::attempt($credentials)) {
-            // Regenerasi session untuk keamanan
             $request->session()->regenerate();
 
             if ($role === 'owner') {
@@ -44,25 +43,28 @@ class AuthController extends Controller
         return back()->with('error', 'Email atau password salah!')->withInput($request->only('email'));
     }
 
-    // Tampilkan halaman pilih role register
+    // ==================== REGISTER ====================
+
+    // Step 1: Pilih role (user/owner)
     public function showRegister()
     {
         return view('auth.register');
     }
 
-    // Tampilkan form register
-    public function showRegisterForm($role = 'user')
+    // Step 2: Form akun (nama, email, password)
+    public function showRegisterForm($role)
     {
         return view('auth.register-form', ['role' => $role]);
     }
 
-    // Proses register
-    public function register(Request $request)
+    // Step 2: Proses form akun - simpan ke session dulu, BELUM ke database
+    public function submitRegisterForm(Request $request)
     {
         $request->validate([
             'name' => 'required|min:3',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
+            'role' => 'required|in:user,owner',
         ], [
             'name.required' => 'Nama wajib diisi.',
             'name.min' => 'Nama minimal 3 karakter.',
@@ -74,32 +76,116 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
+        // Simpan data di session, belum masuk database
+        session([
+            'register_data' => [
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => $request->input('password'),
+                'role' => $request->input('role'),
+            ]
         ]);
 
-        // Langsung login setelah register
+        // Arahkan ke halaman profile sesuai role
+        $role = $request->input('role');
+        if ($role === 'owner') {
+            return redirect('/register/profile/owner');
+        }
+        return redirect('/register/profile/user');
+    }
+
+    // Step 3: Form profil user
+    public function showProfileUser()
+    {
+        if (!session('register_data')) {
+            return redirect('/register')->with('error', 'Silakan isi data akun terlebih dahulu.');
+        }
+        return view('auth.register-profile-user');
+    }
+
+    // Step 3: Form profil owner
+    public function showProfileOwner()
+    {
+        if (!session('register_data')) {
+            return redirect('/register')->with('error', 'Silakan isi data akun terlebih dahulu.');
+        }
+        return view('auth.register-profile-owner');
+    }
+
+    // Step 3: Proses simpan profil ke session
+    public function submitProfile(Request $request)
+    {
+        $registerData = session('register_data');
+        if (!$registerData) {
+            return redirect('/register');
+        }
+
+        // Tambahkan data profil ke session
+        $registerData['nama_lengkap'] = $request->input('nama', '');
+        $registerData['alamat'] = $request->input('alamat', '');
+        $registerData['tanggal_lahir'] = $request->input('tanggal_lahir', '');
+        $registerData['telepon'] = $request->input('telepon', '');
+        $registerData['bank'] = $request->input('bank', '');
+        $registerData['rekening'] = $request->input('rekening', '');
+
+        session(['register_data' => $registerData]);
+
+        return redirect('/register/preferensi');
+    }
+
+    // Step 4: Form preferensi
+    public function showPreferensi()
+    {
+        if (!session('register_data')) {
+            return redirect('/register')->with('error', 'Silakan isi data akun terlebih dahulu.');
+        }
+        return view('auth.register-preferensi');
+    }
+
+    // Step 4: Proses simpan preferensi + SIMPAN KE DATABASE + AUTO LOGIN
+    public function submitPreferensi(Request $request)
+    {
+        $registerData = session('register_data');
+        if (!$registerData) {
+            return redirect('/register');
+        }
+
+        // Sekarang baru simpan ke database
+        $user = User::create([
+            'name' => $registerData['name'],
+            'email' => $registerData['email'],
+            'password' => Hash::make($registerData['password']),
+        ]);
+
+        // Bersihkan session register
+        session()->forget('register_data');
+
+        // Auto login setelah semua step selesai
         Auth::login($user);
         $request->session()->regenerate();
 
         return redirect('/register/welcome')->with('success', 'Registrasi berhasil! Selamat datang di Courtee.');
     }
 
-    // Logout
+    // Step 5: Halaman welcome
+    public function showWelcome()
+    {
+        return view('auth.welcome');
+    }
+
+    // ==================== LOGOUT ====================
+
     public function logout(Request $request)
     {
         Auth::logout();
-
-        // Invalidate session dan regenerate token
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect('/')->with('success', 'Anda telah berhasil logout.');
     }
 
-    // Lihat daftar user (READ)
+    // ==================== READ USERS ====================
+
     public function listUsers()
     {
         $users = User::all();

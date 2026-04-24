@@ -22,8 +22,9 @@ Route::prefix('community')->name('community.')->group(function () {
     Route::get('/event', function () { return view('community.event'); })->name('event');
 });
 
-// ============ AUTH (guest middleware - hanya untuk yang belum login) ============
+// ============ AUTH - GUEST ONLY (belum login) ============
 Route::middleware('guest')->group(function () {
+    // Login
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login/penyewa', function (\Illuminate\Http\Request $request) {
         $request->merge(['role' => 'user']);
@@ -34,16 +35,28 @@ Route::middleware('guest')->group(function () {
         return app(AuthController::class)->login($request);
     })->name('login.owner');
 
+    // Register Step 1: Pilih role
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::get('/register/user', function () { return view('auth.register-form', ['role' => 'user']); })->name('register.user');
-    Route::get('/register/owner', function () { return view('auth.register-form', ['role' => 'owner']); })->name('register.owner');
-    Route::post('/register/submit', [AuthController::class, 'register'])->name('register.submit');
+
+    // Register Step 2: Form akun
+    Route::get('/register/user', [AuthController::class, 'showRegisterForm'])->defaults('role', 'user')->name('register.user');
+    Route::get('/register/owner', [AuthController::class, 'showRegisterForm'])->defaults('role', 'owner')->name('register.owner');
+    Route::post('/register/submit', [AuthController::class, 'submitRegisterForm'])->name('register.submit');
+
+    // Register Step 3: Profil
+    Route::get('/register/profile/user', [AuthController::class, 'showProfileUser'])->name('register.profile.user');
+    Route::get('/register/profile/owner', [AuthController::class, 'showProfileOwner'])->name('register.profile.owner');
+    Route::post('/register/profile/save', [AuthController::class, 'submitProfile'])->name('register.profile.save');
+
+    // Register Step 4: Preferensi
+    Route::get('/register/preferensi', [AuthController::class, 'showPreferensi'])->name('register.preferensi');
+    Route::post('/register/preferensi/save', [AuthController::class, 'submitPreferensi'])->name('register.preferensi.save');
 });
 
-// ============ AUTH (auth middleware - hanya untuk yang sudah login) ============
+// ============ AUTH - LOGGED IN ONLY (sudah login) ============
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/register/welcome', function () { return view('auth.welcome'); })->name('register.welcome');
+    Route::get('/register/welcome', [AuthController::class, 'showWelcome'])->name('register.welcome');
     Route::get('/users', [AuthController::class, 'listUsers'])->name('users.list');
 });
 
