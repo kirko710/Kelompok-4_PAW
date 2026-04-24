@@ -1,59 +1,33 @@
-@php
-    $urlShow    = route('admin.lapangan.show');
-    $urlLapangan = route('admin.lapangan');
-@endphp
-
 <x-layout.admin title="Buat Lapangan Baru" activeMenu="admin.lapangan" breadcrumb="Dashboard > Manajemen Lapangan dan Venue">
 
-    <div
-        x-data="{
-            nama: '',
-            lokasi: '',
-            harga: '',
-            jenisOlahraga: '',
-            fotoPreview: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80',
-            urlShow: '{{ $urlShow }}',
-            urlLapangan: '{{ $urlLapangan }}',
-            submit() {
-                if (!this.nama.trim()) {
-                    alert('Nama lapangan tidak boleh kosong.');
-                    return;
-                }
-                const data = {
-                    nama: this.nama,
-                    lokasi: this.lokasi,
-                    harga: this.harga,
-                    jenisOlahraga: this.jenisOlahraga,
-                    foto: this.fotoPreview,
-                };
-                localStorage.setItem('lapangan_data', JSON.stringify(data));
-                window.location.href = this.urlShow;
-            },
-            cancel() {
-                window.location.href = this.urlLapangan;
-            }
-        }"
-    >
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Manajemen Lapangan</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Manajemen Lapangan</h2>
 
-        <div class="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+    @if(session('success'))
+        <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm font-medium">
+            {{ session('success') }}
+        </div>
+    @endif
 
-            {{-- Header --}}
-            <div class="flex items-center gap-2 mb-6">
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M9 21V10m6 11V10M3 10l9-7 9 7"/>
-                </svg>
-                <h3 class="font-bold text-gray-800">Lapangan Anda</h3>
-            </div>
+    <div class="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
 
-            {{-- Form Card --}}
+        {{-- Header --}}
+        <div class="flex items-center gap-2 mb-6">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M9 21V10m6 11V10M3 10l9-7 9 7"/>
+            </svg>
+            <h3 class="font-bold text-gray-800">Lapangan Anda</h3>
+        </div>
+
+        {{-- Form Card --}}
+        <form method="POST" action="{{ route('admin.lapangan.store') }}">
+            @csrf
             <div class="flex flex-col md:flex-row gap-8 border border-gray-100 rounded-xl p-6 bg-gray-50/50">
 
                 {{-- Foto Lapangan --}}
                 <div class="md:w-2/5 flex-shrink-0">
                     <div class="h-64 rounded-xl overflow-hidden bg-gray-200">
                         <img
-                            :src="fotoPreview"
+                            src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80"
                             alt="Foto Lapangan"
                             class="w-full h-full object-cover"
                         >
@@ -71,20 +45,50 @@
 
                 {{-- Form Fields --}}
                 <div class="md:w-3/5 space-y-4">
+
+                    {{-- Venue Dropdown --}}
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Venue</label>
+                        <div class="relative mt-1">
+                            <select
+                                name="venue_id"
+                                class="w-full appearance-none border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition bg-white @error('venue_id') border-red-400 @enderror"
+                            >
+                                <option value="">Pilih Venue</option>
+                                @foreach($venues as $venue)
+                                    <option value="{{ $venue['id'] }}" {{ old('venue_id') === $venue['id'] ? 'selected' : '' }}>
+                                        {{ $venue['nama'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        @error('venue_id')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div>
                         <label class="text-sm font-medium text-gray-700">Nama Lapangan</label>
                         <input
                             type="text"
-                            x-model="nama"
+                            name="nama"
+                            value="{{ old('nama') }}"
                             placeholder="Contoh: Lapangan Sejahtera"
-                            class="w-full mt-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition"
+                            class="w-full mt-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition @error('nama') border-red-400 @enderror"
                         >
+                        @error('nama')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-700">Lokasi</label>
                         <input
                             type="text"
-                            x-model="lokasi"
+                            name="lokasi"
+                            value="{{ old('lokasi') }}"
                             placeholder="Contoh: Jl. Ahmad Yani, No 77, Senayan, Jakarta Pusat"
                             class="w-full mt-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition"
                         >
@@ -93,10 +97,14 @@
                         <label class="text-sm font-medium text-gray-700">Harga per Jam</label>
                         <input
                             type="text"
-                            x-model="harga"
+                            name="harga"
+                            value="{{ old('harga') }}"
                             placeholder="Contoh: Rp 27.000,00"
-                            class="w-full mt-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition"
+                            class="w-full mt-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition @error('harga') border-red-400 @enderror"
                         >
+                        @error('harga')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-700">Atur Slot Waktu</label>
@@ -117,31 +125,35 @@
                     <div>
                         <label class="text-sm font-medium text-gray-700">Jenis Olahraga</label>
                         <div class="relative mt-1">
-                            <select x-model="jenisOlahraga" class="w-full appearance-none border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-500 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition bg-white">
+                            <select
+                                name="jenis_olahraga"
+                                class="w-full appearance-none border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-500 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition bg-white @error('jenis_olahraga') border-red-400 @enderror"
+                            >
                                 <option value="">Jenis Olahraga</option>
-                                <option value="Futsal">Futsal</option>
-                                <option value="Badminton">Badminton</option>
-                                <option value="Basket">Basket</option>
-                                <option value="Tenis">Tenis</option>
-                                <option value="Voli">Voli</option>
+                                <option value="Futsal" {{ old('jenis_olahraga') === 'Futsal' ? 'selected' : '' }}>Futsal</option>
+                                <option value="Badminton" {{ old('jenis_olahraga') === 'Badminton' ? 'selected' : '' }}>Badminton</option>
+                                <option value="Basket" {{ old('jenis_olahraga') === 'Basket' ? 'selected' : '' }}>Basket</option>
+                                <option value="Tenis" {{ old('jenis_olahraga') === 'Tenis' ? 'selected' : '' }}>Tenis</option>
+                                <option value="Voli" {{ old('jenis_olahraga') === 'Voli' ? 'selected' : '' }}>Voli</option>
                             </select>
                             <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </div>
+                        @error('jenis_olahraga')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex justify-end gap-3 pt-4">
-                        <button
-                            type="button"
-                            @click="cancel()"
+                        <a
+                            href="{{ route('admin.lapangan') }}"
                             class="px-6 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
                         >
                             Batal
-                        </button>
+                        </a>
                         <button
-                            type="button"
-                            @click="submit()"
+                            type="submit"
                             class="px-8 py-2.5 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 active:scale-95 transition"
                         >
                             Buat
@@ -150,8 +162,8 @@
                 </div>
 
             </div>
+        </form>
 
-        </div>
     </div>
 
 </x-layout.admin>
