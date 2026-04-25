@@ -32,9 +32,16 @@ class AuthController extends Controller
         $role = $request->input('role', 'user');
 
         if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+
+            if ($user->role !== $role) {
+                Auth::logout();
+                return back()->with('error', "Akun ini terdaftar sebagai '{$user->role}'. Gunakan tombol Login sebagai {$user->role}!")->withInput();
+            }
+
             $request->session()->regenerate();
 
-            if ($role === 'owner') {
+            if ($user->role === 'owner') {
                 return redirect('/admin')->with('success', 'Login berhasil sebagai Owner!');
             }
             return redirect('/')->with('success', 'Login berhasil!');
@@ -121,12 +128,14 @@ class AuthController extends Controller
         }
 
         // Tambahkan data profil ke session
-        $registerData['nama_lengkap'] = $request->input('nama', '');
-        $registerData['alamat'] = $request->input('alamat', '');
-        $registerData['tanggal_lahir'] = $request->input('tanggal_lahir', '');
-        $registerData['telepon'] = $request->input('telepon', '');
-        $registerData['bank'] = $request->input('bank', '');
-        $registerData['rekening'] = $request->input('rekening', '');
+        $registerData = array_merge($registerData, [
+            'nama_lengkap' => $request->input('nama', ''),
+            'alamat' => $request->input('alamat', ''),
+            'tanggal_lahir' => $request->input('tanggal_lahir', ''),
+            'telepon' => $request->input('telepon', ''),
+            'bank' => $request->input('bank', ''),
+            'rekening' => $request->input('rekening', ''),
+        ]);
 
         session(['register_data' => $registerData]);
 
@@ -155,6 +164,7 @@ class AuthController extends Controller
             'name' => $registerData['name'],
             'email' => $registerData['email'],
             'password' => Hash::make($registerData['password']),
+            'role' => $registerData['role'],
         ]);
 
         // Bersihkan session register

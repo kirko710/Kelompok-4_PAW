@@ -72,9 +72,12 @@
                     {{ ($activeMenu ?? '') === 'admin.profile' ? 'bg-white/20 text-white shadow-lg' : '' }}">
                     Profile
                 </a>
-                <a href="{{ route('home') }}" class="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-red-500/80 hover:bg-red-500 transition">
-                    Logout
-                </a>
+                <form action="{{ route('logout') }}" method="POST" class="block w-full" style="display: inline;">
+                @csrf
+                    <button type="submit" class="w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-red-500/80 hover:bg-red-500 transition">
+                        Logout
+                    </button>
+                </form>
             </div>
         </aside>
 
@@ -93,7 +96,14 @@
                     </button>
                     <div class="flex items-center gap-3">
                         <img src="https://ui-avatars.com/api/?name=Saipul+Alexander&background=7e22ce&color=fff" alt="Avatar" class="w-9 h-9 rounded-full">
-                        <span class="text-sm font-medium text-gray-700">Saipul Alexander</span>
+                        <div class="text-right">
+                            <div class="text-sm font-semibold text-gray-800 leading-tight">
+                                {{ Auth::user()->name ?? 'Admin' }}
+                            </div>
+                            <div class="text-xs text-courtee-600 font-medium">
+                                {{ ucfirst(Auth::user()->role ?? 'Owner') }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>

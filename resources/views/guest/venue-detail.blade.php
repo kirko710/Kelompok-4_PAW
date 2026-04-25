@@ -45,6 +45,17 @@
     transition: opacity var(--transition);
 }
 .btn-cta:hover { opacity: 0.85; }
+.no-login-container {
+    text-align: center; margin-top: 32px; padding: 20px 0;
+}
+.no-login-msg {
+    color: #64748b; font-size: 14px; margin-top: 24px; line-height: 1.6;
+}
+.no-login-link {
+    color: #8b5cf6; font-weight: 600; text-decoration: none;
+    transition: all 0.2s;
+}
+.no-login-link:hover { text-decoration: underline; }
 @media (max-width: 768px) {
     .court-card { flex-direction: column; }
     .court-card__image, .court-card__body { width: 100%; }
@@ -115,8 +126,16 @@
         @empty
         <p style="color: #999; text-align: center; padding: 40px 0;">Belum ada lapangan tersedia untuk venue ini.</p>
         @endforelse
-
-        <a href="/detail-pemesanan"><button class="btn-cta">Lanjutkan ke Pembayaran</button></a>
+        @auth
+            <a href="/detail-pemesanan"><button class="btn-cta">Lanjutkan ke Pembayaran</button></a>
+        @else
+            <div class="no-login-container">
+                <p class="no-login-msg"> Anda tidak bisa memesan karena belum login, 
+                    <a href="{{ route('login') }}" class="no-login-link">klik disini untuk login</a>
+                </p>
+                <button class="btn-cta" disabled style="opacity: 0.6; cursor: not-allowed;">Lanjutkan ke Pembayaran</button>
+            </div>
+        @endauth
     </div>
 </div>
 @endsection
