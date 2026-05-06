@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -32,16 +34,9 @@ class AuthController extends Controller
         $role = $request->input('role', 'user');
 
         if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-
-            if ($user->role !== $role) {
-                Auth::logout();
-                return back()->with('error', "Akun ini terdaftar sebagai '{$user->role}'. Gunakan tombol Login sebagai {$user->role}!")->withInput();
-            }
-
             $request->session()->regenerate();
 
-            if ($user->role === 'owner') {
+              if ($role === 'owner') {
                 return redirect('/admin')->with('success', 'Login berhasil sebagai Owner!');
             }
             return redirect('/')->with('success', 'Login berhasil!');
@@ -94,8 +89,7 @@ class AuthController extends Controller
         ]);
 
         // Arahkan ke halaman profile sesuai role
-        $role = $request->input('role');
-        if ($role === 'owner') {
+        if ($request->input('role') === 'owner') {
             return redirect('/register/profile/owner');
         }
         return redirect('/register/profile/user');
@@ -128,15 +122,13 @@ class AuthController extends Controller
         }
 
         // Tambahkan data profil ke session
-        $registerData = array_merge($registerData, [
-            'nama_lengkap' => $request->input('nama', ''),
-            'alamat' => $request->input('alamat', ''),
-            'tanggal_lahir' => $request->input('tanggal_lahir', ''),
-            'telepon' => $request->input('telepon', ''),
-            'bank' => $request->input('bank', ''),
-            'rekening' => $request->input('rekening', ''),
-        ]);
-
+        $registerData['nama_lengkap'] = $request->input('nama', '');
+        $registerData['alamat'] = $request->input('alamat', '');
+        $registerData['tanggal_lahir'] = $request->input('tanggal_lahir', '');
+        $registerData['telepon'] = $request->input('telepon', '');
+        $registerData['bank'] = $request->input('bank', '');
+        $registerData['rekening'] = $request->input('rekening', '');
+        
         session(['register_data' => $registerData]);
 
         return redirect('/register/preferensi');
@@ -167,8 +159,37 @@ class AuthController extends Controller
             'role' => $registerData['role'],
         ]);
 
-        // Bersihkan session register
+        // CREATE user profile ke database
+        UserProfile::create([
+            'user_id' => $user->id,
+            'nama_lengkap' => $registerData['nama_lengkap'] ?? '',
+            'alamat' => $registerData['alamat'] ?? '',
+            'tanggal_lahir' => $registerData['tanggal_lahir'] ?? '',
+            'telepon' => $registerData['telepon'] ?? '',
+            'bank' => $registerData['bank'] ?? '',
+            'rekening' => $registerData['rekening'] ?? '',
+            'olahraga_favorit' => $request->input('olahraga', []),
+        ]);
+	
+	$jsonPath = 'user_preferences.json';
+        $preferences = [];
+        if (Storage::exists($jsonPath)) {
+            $preferences = json_decode(Storage::get($jsonPath), true);
+        }
+        $preferences[$user->id] = [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'olahraga_favorit' => $request->input('olahraga', []),
+            'notifikasi_email' => true,
+            'notifikasi_booking' => true,
+            'updated_at' => now()->format('d M Y H:i'),
+        ];
+        Storage::put($jsonPath, json_encode($preferences, JSON_PRETTY_PRINT));
+
+        // Simpan role sebelum clear session
+        $role = $registerData['role'];
         session()->forget('register_data');
+        session(['registered_role' => $role]);
 
         // Auto login setelah semua step selesai
         Auth::login($user);
@@ -198,7 +219,7 @@ class AuthController extends Controller
 
     public function listUsers()
     {
-        $users = User::all();
+       $users = User::with('profile')->get();
         return view('auth.users-list', compact('users'));
     }
 }

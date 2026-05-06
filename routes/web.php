@@ -43,6 +43,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/pembayaran', fn () => view('penyewa.pembayaran'))->name('pembayaran');
     Route::get('/profile', fn () => view('penyewa.profile'))->name('user.profile');
 });
+
+// ============ USER PREFERENCES (JSON CRUD) ============
+Route::middleware('auth')->group(function () {
+    Route::get('/preferensi', [App\Http\Controllers\UserPreferenceController::class, 'index'])->name('preferensi.index');
+    Route::post('/preferensi/save', [App\Http\Controllers\UserPreferenceController::class, 'store'])->name('preferensi.save');
+    Route::get('/preferensi/all', [App\Http\Controllers\UserPreferenceController::class, 'all'])->name('preferensi.all');
+});
 // ============ ADMIN (affan) ============
 Route::middleware(['auth', 'role:owner'])->prefix('admin') ->name('admin.')->group(function () {
     Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
