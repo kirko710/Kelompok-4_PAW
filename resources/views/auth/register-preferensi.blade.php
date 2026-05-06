@@ -55,16 +55,19 @@
                     <option>Futsal</option>
                     <option>Renang</option>
                 </select>
-                <div class="flex gap-2 mt-3">
-                    <span class="flex items-center gap-1.5 px-3 py-1 bg-courtee-50 border border-courtee-200 rounded-full text-xs text-courtee-600 font-medium">
-                        <span class="w-2 h-2 bg-courtee-500 rounded-full"></span> Sepak Bola <button class="ml-0.5 hover:text-red-500">&times;</button>
-                    </span>
-                    <span class="flex items-center gap-1.5 px-3 py-1 bg-courtee-50 border border-courtee-200 rounded-full text-xs text-courtee-600 font-medium">
-                        <span class="w-2 h-2 bg-courtee-500 rounded-full"></span> Basket <button class="ml-0.5 hover:text-red-500">&times;</button>
-                    </span>
-                    <span class="flex items-center gap-1.5 px-3 py-1 bg-courtee-50 border border-courtee-200 rounded-full text-xs text-courtee-600 font-medium">
-                        <span class="w-2 h-2 bg-courtee-500 rounded-full"></span> Tenis <button class="ml-0.5 hover:text-red-500">&times;</button>
-                    </span>
+               <div>
+                  <label class="text-sm text-gray-500 mb-1 block">Olahraga Favorit</label>
+
+                  <input
+                      type="text"
+                      id="sportInput"
+                      placeholder="Ketik olahraga lalu tekan Enter"
+                      class="w-full border border-purple-400 rounded-xl px-5 py-3.5 text-sm outline-none focus:border-purple-500 transition"
+                  >
+
+                  <div id="sportChips" class="flex flex-wrap gap-2 mt-3"></div>
+
+                  <div id="hiddenSports"></div>
                 </div>
             </div>
 
@@ -87,5 +90,62 @@
             </div>
         </form>
     </div>
+<script>
+    const sportInput = document.getElementById('sportInput');
+    const sportChips = document.getElementById('sportChips');
+    const hiddenSports = document.getElementById('hiddenSports');
+
+    let selectedSports = [];
+
+    function renderSports() {
+        sportChips.innerHTML = '';
+        hiddenSports.innerHTML = '';
+
+        selectedSports.forEach((sport, index) => {
+            const chip = document.createElement('span');
+            chip.className = 'inline-flex items-center gap-2 bg-purple-100 text-purple-600 border border-purple-300 px-3 py-1 rounded-full text-xs font-medium';
+            chip.innerHTML = `
+                <span>● ${sport}</span>
+                <button type="button" onclick="removeSport(${index})" class="font-bold">×</button>
+            `;
+
+            sportChips.appendChild(chip);
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'olahraga[]';
+            hiddenInput.value = sport;
+
+            hiddenSports.appendChild(hiddenInput);
+        });
+    }
+
+    function addSport() {
+        const sport = sportInput.value.trim();
+
+        if (sport === '') return;
+
+        if (!selectedSports.includes(sport)) {
+            selectedSports.push(sport);
+        }
+
+        sportInput.value = '';
+        renderSports();
+    }
+
+    function removeSport(index) {
+        selectedSports.splice(index, 1);
+        renderSports();
+    }
+
+    sportInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addSport();
+        }
+    });
+
+    renderSports();
+</script>
 </body>
 </html>
