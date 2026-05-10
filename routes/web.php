@@ -63,10 +63,8 @@ Route::middleware('auth')->group(function () {
 // ============ ADMIN / PENGELOLA (affan) ============
 Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
-    Route::get('/venue', fn () => view('admin.venue'))->name('venue');
-    Route::get('/venue/create', fn () => view('admin.venue-create'))->name('venue.create');
 
-    // Venue
+    // Venue - Full CRUD
     Route::get('/venue', [VenueController::class, 'index'])->name('venue');
     Route::get('/venue/create', [VenueController::class, 'create'])->name('venue.create');
     Route::post('/venue', [VenueController::class, 'store'])->name('venue.store');
@@ -75,7 +73,7 @@ Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->grou
     Route::put('/venue/{id}', [VenueController::class, 'update'])->name('venue.update');
     Route::delete('/venue/{id}', [VenueController::class, 'destroy'])->name('venue.destroy');
 
-    // Lapangan
+    // Lapangan - Full CRUD
     Route::get('/lapangan', [LapanganController::class, 'index'])->name('lapangan');
     Route::get('/lapangan/create', [LapanganController::class, 'create'])->name('lapangan.create');
     Route::post('/lapangan', [LapanganController::class, 'store'])->name('lapangan.store');

@@ -116,7 +116,7 @@
     <div class="venue-results">
         @forelse($venues as $venue)
         <div class="venue-result-card">
-            <div class="venue-result-card__name">{{ $venue['nama'] }}</div>
+            <div class="venue-result-card__name">{{ $venue->nama }}</div>
             <div class="venue-result-card__meta">
                 {{ $venue->lokasi }}<br>
                 @if($venue->deskripsi)

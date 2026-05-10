@@ -2,82 +2,149 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lapangan;
+use App\Models\Venue;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class LapanganController extends Controller
 {
-    private string $lapanganPath;
-    private string $venuePath;
-
-    public function __construct()
-    {
-        $this->lapanganPath = storage_path('app/lapangan.json');
-        $this->venuePath    = storage_path('app/venues.json');
-    }
-
-    private function readLapangan(): array
-    {
-        if (!file_exists($this->lapanganPath)) {
-            file_put_contents($this->lapanganPath, json_encode([], JSON_PRETTY_PRINT));
-            return [];
-        }
-        $content = file_get_contents($this->lapanganPath);
-        return json_decode($content, true) ?? [];
-    }
-
-    private function writeLapangan(array $lapangan): void
-    {
-        file_put_contents($this->lapanganPath, json_encode($lapangan, JSON_PRETTY_PRINT));
-    }
-
-    private function readVenues(): array
-    {
-        if (!file_exists($this->venuePath)) {
-            return [];
-        }
-        $content = file_get_contents($this->venuePath);
-        return json_decode($content, true) ?? [];
-    }
-
+    /**
+     * Tampilkan semua lapangan milik pengelola yang sedang login.
+     */
     public function index()
     {
-        $venues   = $this->readVenues();
-        $hasVenue = count($venues) > 0;
-        $lapangan = $this->readLapangan();
+        $venueIds = Venue::where('id_user', Auth::id())->pluck('id');
+        $hasVenue = $venueIds->isNotEmpty();
 
-        return view('admin.lapangan', compact('hasVenue', 'lapangan', 'venues'));
+        $lapangans = Lapangan::with('venue')
+            ->whereIn('id_venue', $venueIds)
+            ->latest()
+            ->get();
+
+        return view('admin.lapangan', compact('hasVenue', 'lapangans'));
     }
 
+    /**
+     * Form tambah lapangan baru.
+     */
     public function create()
     {
-        $venues = $this->readVenues();
+        $venues = Venue::where('id_user', Auth::id())->get();
         return view('admin.lapangan-create', compact('venues'));
     }
 
+    /**
+     * Simpan lapangan baru ke database.
+     */
     public function store(Request $request)
     {
         $request->validate([
             'nama'           => 'required|string|max:255',
-            'venue_id'       => 'required|string',
+            'id_venue'       => 'required|exists:venues,id',
             'jenis_olahraga' => 'required|string|max:100',
-            'harga'          => 'required|string|max:100',
+            'harga_sewa'     => 'required|numeric|min:0',
+            'foto'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'jam_buka'       => 'nullable|date_format:H:i',
+            'jam_tutup'      => 'nullable|date_format:H:i|after:jam_buka',
         ]);
 
-        $lapangan = $this->readLapangan();
+        // Pastikan venue yang dipilih milik pengelola yang login
+        $venue = Venue::where('id_user', Auth::id())->findOrFail($request->id_venue);
 
-        $lapangan[] = [
-            'id'             => Str::uuid()->toString(),
-            'venue_id'       => $request->input('venue_id'),
-            'nama'           => $request->input('nama'),
-            'lokasi'         => $request->input('lokasi', ''),
-            'harga'          => $request->input('harga'),
-            'jenis_olahraga' => $request->input('jenis_olahraga'),
-            'foto'           => $request->input('foto') ?: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80',
-        ];
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('lapangans', 'public');
+        }
 
-        $this->writeLapangan($lapangan);
+        Lapangan::create([
+            'id_venue'       => $venue->id,
+            'nama'           => $request->nama,
+            'jenis_olahraga' => $request->jenis_olahraga,
+            'harga_sewa'     => $request->harga_sewa,
+            'foto'           => $fotoPath,
+            'jam_buka'       => $request->jam_buka,
+            'jam_tutup'      => $request->jam_tutup,
+        ]);
 
         return redirect()->route('admin.lapangan')->with('success', 'Lapangan berhasil ditambahkan!');
+    }
+
+    /**
+     * Form edit lapangan.
+     */
+    public function edit($id)
+    {
+        $venueIds = Venue::where('id_user', Auth::id())->pluck('id');
+        $lapangan = Lapangan::whereIn('id_venue', $venueIds)->findOrFail($id);
+        $venues   = Venue::where('id_user', Auth::id())->get();
+
+        return view('admin.lapangan-edit', compact('lapangan', 'venues'));
+    }
+
+    /**
+     * Update lapangan di database.
+     */
+    public function update(Request $request, $id)
+    {
+        $venueIds = Venue::where('id_user', Auth::id())->pluck('id');
+        $lapangan = Lapangan::whereIn('id_venue', $venueIds)->findOrFail($id);
+
+        $request->validate([
+            'nama'           => 'required|string|max:255',
+            'id_venue'       => 'required|exists:venues,id',
+            'jenis_olahraga' => 'required|string|max:100',
+            'harga_sewa'     => 'required|numeric|min:0',
+            'foto'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'jam_buka'       => 'nullable|date_format:H:i',
+            'jam_tutup'      => 'nullable|date_format:H:i|after:jam_buka',
+        ]);
+
+        // Pastikan venue target juga milik pengelola yang login
+        Venue::where('id_user', Auth::id())->findOrFail($request->id_venue);
+
+        $data = [
+            'id_venue'       => $request->id_venue,
+            'nama'           => $request->nama,
+            'jenis_olahraga' => $request->jenis_olahraga,
+            'harga_sewa'     => $request->harga_sewa,
+            'jam_buka'       => $request->jam_buka,
+            'jam_tutup'      => $request->jam_tutup,
+        ];
+
+        if ($request->hasFile('foto')) {
+            if ($lapangan->foto) {
+                Storage::disk('public')->delete($lapangan->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('lapangans', 'public');
+        }
+
+        $lapangan->update($data);
+
+        return redirect()->route('admin.lapangan')->with('success', 'Lapangan berhasil diperbarui!');
+    }
+
+    /**
+     * Hapus lapangan dari database.
+     * Ditolak jika ada pemesanan aktif atau pending.
+     */
+    public function destroy($id)
+    {
+        $venueIds = Venue::where('id_user', Auth::id())->pluck('id');
+        $lapangan = Lapangan::whereIn('id_venue', $venueIds)->findOrFail($id);
+
+        if ($lapangan->hasActivePemesanan()) {
+            return redirect()->route('admin.lapangan')
+                ->with('error', 'Lapangan tidak dapat dihapus karena masih ada pemesanan aktif atau pending.');
+        }
+
+        if ($lapangan->foto) {
+            Storage::disk('public')->delete($lapangan->foto);
+        }
+
+        $lapangan->delete();
+
+        return redirect()->route('admin.lapangan')->with('success', 'Lapangan berhasil dihapus!');
     }
 }

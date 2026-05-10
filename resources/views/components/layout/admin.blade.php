@@ -67,14 +67,22 @@
             </div>
 
             {{-- Bottom Actions --}}
-            <div class="p-6 space-y-2">
-                <a href="{{ route('admin.profile') }}" class="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-courtee-400/30 hover:bg-courtee-400/50 transition
-                    {{ ($activeMenu ?? '') === 'admin.profile' ? 'bg-white/20 text-white shadow-lg' : '' }}">
+            <div class="p-6 border-t border-white/10 space-y-2">
+                <a href="{{ route('admin.profile') }}"
+                   class="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-medium transition
+                       {{ ($activeMenu ?? '') === 'admin.profile' ? 'bg-white/20 text-white shadow-lg' : 'text-white/80 bg-white/5 hover:bg-white/15 hover:text-white' }}">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                    </svg>
                     Profile
                 </a>
-                <form action="{{ route('logout') }}" method="POST" class="block w-full" style="display: inline;">
-                @csrf
-                    <button type="submit" class="w-full text-center px-4 py-2.5 rounded-xl text-sm font-medium bg-red-500/80 hover:bg-red-500 transition">
+                <form action="{{ route('logout') }}" method="POST" class="w-full">
+                    @csrf
+                    <button type="submit"
+                            class="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-medium bg-red-500/20 hover:bg-red-500/80 text-white/80 hover:text-white transition">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+                        </svg>
                         Logout
                     </button>
                 </form>
