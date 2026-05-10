@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_pemesanan')->constrained('pemesanans')->onDelete('cascade');
-            $table->enum('metode_pembayaran', ['transfer_bank', 'e_wallet', 'kartu_kredit', 'tunai'])->default('transfer_bank');
+            $table->enum('metode_pembayaran', ['transfer_bank', 'qris', 'tunai'])->default('transfer_bank');
             $table->enum('status_bayar', ['unpaid', 'pending', 'paid', 'failed', 'refunded'])->default('unpaid');
             $table->timestamp('tanggal_pembayaran')->nullable();
             $table->string('nomor_referensi')->nullable();
