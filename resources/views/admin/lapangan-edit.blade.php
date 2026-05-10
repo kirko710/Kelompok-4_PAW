@@ -1,7 +1,7 @@
-<x-layout.admin title="Tambah Lapangan" activeMenu="admin.lapangan" breadcrumb="Dashboard > Manajemen Lapangan > Buat Baru">
+<x-layout.admin title="Edit Lapangan" activeMenu="admin.lapangan" breadcrumb="Dashboard > Manajemen Lapangan > Edit">
 
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Tambah Lapangan Baru</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Edit Lapangan</h2>
         <a href="{{ route('admin.lapangan') }}" class="text-sm text-gray-500 hover:text-purple-600 transition flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
@@ -20,39 +20,40 @@
         </div>
     @endif
 
-    @if($venues->isEmpty())
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
-            <p class="text-amber-700 font-medium">Anda belum memiliki venue.</p>
-            <a href="{{ route('admin.venue.create') }}" class="mt-2 inline-block text-purple-600 font-semibold hover:underline">
-                Buat venue terlebih dahulu →
-            </a>
-        </div>
-    @else
-
     <div class="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
 
         <div class="flex items-center gap-2 mb-6">
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M9 21V10m6 11V10M3 10l9-7 9 7"/>
             </svg>
-            <h3 class="font-bold text-gray-800">Detail Lapangan</h3>
+            <h3 class="font-bold text-gray-800">Edit Detail Lapangan</h3>
         </div>
 
-        <form method="POST" action="{{ route('admin.lapangan.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('admin.lapangan.update', $lapangan->id) }}" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
             <div class="flex flex-col md:flex-row gap-8 border border-gray-100 rounded-xl p-6 bg-gray-50/50">
 
-                {{-- Upload Foto --}}
+                {{-- Foto Lapangan --}}
                 <div class="md:w-2/5 flex-shrink-0">
                     <div class="h-64 rounded-xl overflow-hidden bg-gray-200 relative">
-                        <img
-                            id="foto-preview"
-                            src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80"
-                            alt="Preview Foto Lapangan"
-                            class="w-full h-full object-cover"
-                        >
+                        @if($lapangan->foto)
+                            <img
+                                id="foto-preview"
+                                src="{{ Storage::url($lapangan->foto) }}"
+                                alt="{{ $lapangan->nama }}"
+                                class="w-full h-full object-cover"
+                            >
+                        @else
+                            <img
+                                id="foto-preview"
+                                src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800&q=80"
+                                alt="Foto Lapangan"
+                                class="w-full h-full object-cover"
+                            >
+                        @endif
                         <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition cursor-pointer" onclick="document.getElementById('foto-input').click()">
-                            <span class="text-white text-sm font-medium">Klik untuk pilih foto</span>
+                            <span class="text-white text-sm font-medium">Klik untuk ganti foto</span>
                         </div>
                     </div>
                     <input
@@ -71,9 +72,9 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Pilih Foto
+                        Ganti Foto
                     </button>
-                    <p class="text-xs text-gray-400 text-center mt-1">JPG, PNG, WEBP. Maks 2MB</p>
+                    <p class="text-xs text-gray-400 text-center mt-1">Kosongkan jika tidak ingin mengganti foto</p>
                 </div>
 
                 {{-- Form Fields --}}
@@ -89,7 +90,7 @@
                             >
                                 <option value="">Pilih Venue</option>
                                 @foreach($venues as $venue)
-                                    <option value="{{ $venue->id }}" {{ old('id_venue') == $venue->id ? 'selected' : '' }}>
+                                    <option value="{{ $venue->id }}" {{ old('id_venue', $lapangan->id_venue) == $venue->id ? 'selected' : '' }}>
                                         {{ $venue->nama }}
                                     </option>
                                 @endforeach
@@ -108,7 +109,7 @@
                         <input
                             type="text"
                             name="nama"
-                            value="{{ old('nama') }}"
+                            value="{{ old('nama', $lapangan->nama) }}"
                             placeholder="Contoh: Lapangan A"
                             class="w-full mt-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition @error('nama') border-red-400 @enderror"
                         >
@@ -127,7 +128,7 @@
                             >
                                 <option value="">Pilih Jenis Olahraga</option>
                                 @foreach(['Futsal','Badminton','Basket','Tenis','Voli','Renang','Gym'] as $olahraga)
-                                    <option value="{{ $olahraga }}" {{ old('jenis_olahraga') === $olahraga ? 'selected' : '' }}>{{ $olahraga }}</option>
+                                    <option value="{{ $olahraga }}" {{ old('jenis_olahraga', $lapangan->jenis_olahraga) === $olahraga ? 'selected' : '' }}>{{ $olahraga }}</option>
                                 @endforeach
                             </select>
                             <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -147,7 +148,7 @@
                             <input
                                 type="number"
                                 name="harga_sewa"
-                                value="{{ old('harga_sewa') }}"
+                                value="{{ old('harga_sewa', $lapangan->harga_sewa) }}"
                                 placeholder="50000"
                                 min="0"
                                 step="1000"
@@ -169,7 +170,7 @@
                                 <input
                                     type="time"
                                     name="jam_buka"
-                                    value="{{ old('jam_buka') }}"
+                                    value="{{ old('jam_buka', $lapangan->jam_buka ? substr($lapangan->jam_buka, 0, 5) : '') }}"
                                     class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition @error('jam_buka') border-red-400 @enderror"
                                 >
                                 @error('jam_buka')
@@ -182,7 +183,7 @@
                                 <input
                                     type="time"
                                     name="jam_tutup"
-                                    value="{{ old('jam_tutup') }}"
+                                    value="{{ old('jam_tutup', $lapangan->jam_tutup ? substr($lapangan->jam_tutup, 0, 5) : '') }}"
                                     class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition @error('jam_tutup') border-red-400 @enderror"
                                 >
                                 @error('jam_tutup')
@@ -203,7 +204,7 @@
                             type="submit"
                             class="px-8 py-2.5 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 active:scale-95 transition"
                         >
-                            Simpan Lapangan
+                            Simpan Perubahan
                         </button>
                     </div>
                 </div>
@@ -212,7 +213,6 @@
         </form>
 
     </div>
-    @endif
 
 @push('scripts')
 <script>
