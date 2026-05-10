@@ -5,16 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\LapanganController;
+use App\Http\Controllers\PemesananController;
+use App\Http\Controllers\PembayaranController;
 
 // ============ HOME (yoga) ============
 Route::get('/', fn () => view('home.index'))->name('home');
-
-// ============ VENUE ============
-Route::get('/venue', [GuestController::class, 'index'])->name('venue.index');
-Route::get('/venue/{id}', [GuestController::class, 'show'])->name('venue.show');
-
-// ============ LAPANGAN SLOTS (public, no auth required) ============
-Route::get('/lapangan/{id}/slots', [GuestController::class, 'getSlots'])->name('lapangan.slots');
 
 // ============ AUTH - GUEST ONLY (belum login) ============
 Route::middleware('guest')->group(function () {
@@ -40,11 +35,22 @@ Route::middleware('guest')->group(function () {
     Route::post('/register/preferensi/save', [AuthController::class, 'submitPreferensi'])->name('register.preferensi.save');
 });
 
+// ============ VENUE ============
+Route::get('/venue', [GuestController::class, 'index'])->name('venue.index');
+Route::get('/venue/{id}', [GuestController::class, 'show'])->name('venue.show');
+
+// ============ LAPANGAN SLOTS (public, no auth required) ============
+Route::get('/lapangan/{id}/slots', [GuestController::class, 'getSlots'])->name('lapangan.slots');
+
 // ============= USER =============
 Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('/detail-pemesanan', fn () => view('penyewa.detail-pemesanan'))->name('pemesanan.detail');
-    Route::get('/pembayaran', fn () => view('penyewa.pembayaran'))->name('pembayaran');
+    Route::post('/pemesanan', [PemesananController::class, 'store'])->name('pemesanan.store');
+    Route::get('/detail-pemesanan/{id}', [PemesananController::class, 'detailPemesanan'])->name('pemesanan.detail');
+    Route::get('/pembayaran/{id_pemesanan}', [PembayaranController::class, 'show'])->name('pembayaran.show');
+    Route::post('/pembayaran/{id}/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
     Route::get('/profile', fn () => view('penyewa.profile'))->name('user.profile');
+    Route::get('/riwayat', [PemesananController::class, 'riwayatIndex'])->name('user.riwayat');
+    Route::get('/riwayat/{id}', [PemesananController::class, 'showRiwayat'])->name('riwayat.detail');
 });
 
 // ============ USER PREFERENCES (JSON CRUD) ============
@@ -53,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/preferensi/save', [App\Http\Controllers\UserPreferenceController::class, 'store'])->name('preferensi.save');
     Route::get('/preferensi/all', [App\Http\Controllers\UserPreferenceController::class, 'all'])->name('preferensi.all');
 });
+
 // ============ ADMIN / PENGELOLA (affan) ============
 Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
@@ -76,8 +83,12 @@ Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/jadwal', fn () => view('admin.jadwal'))->name('jadwal');
     Route::get('/pemesanan', fn () => view('admin.pemesanan'))->name('pemesanan');
-    Route::get('/verifikasi', fn () => view('admin.verifikasi'))->name('verifikasi');
-    Route::get('/pembatalan', fn () => view('admin.pembatalan'))->name('pembatalan');
+    // Route::get('/pemesanan', [PemesananController::class, 'adminIndex'])->name('pemesanan');
+    Route::get('/verifikasi', [App\Http\Controllers\PembayaranController::class, 'daftarVerifikasi'])->name('verifikasi');
+    Route::post('/verifikasi/{id}', [App\Http\Controllers\PembayaranController::class, 'prosesVerifikasi'])->name('verifikasi.proses');
+    Route::get('/pembatalan', [PemesananController::class, 'adminPembatalanIndex'])->name('pembatalan');
+    // Route::get('/verifikasi', fn () => view('admin.verifikasi'))->name('verifikasi');
+    // Route::get('/pembatalan', fn () => view('admin.pembatalan'))->name('pembatalan');
     Route::get('/laporan', fn () => view('admin.laporan'))->name('laporan');
     Route::get('/komunikasi', fn () => view('admin.komunikasi'))->name('komunikasi');
     Route::get('/profile', fn () => view('admin.profile'))->name('profile');

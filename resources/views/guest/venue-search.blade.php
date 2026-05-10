@@ -91,23 +91,24 @@
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
             BOOKING LAPANGAN YANG ANDA INGINKAN
         </div>
-        <div class="search-filters">
-            <select class="filter-input">
-                <option>Jenis Lapangan</option>
-                <option>Futsal</option>
-                <option>Badminton</option>
-                <option>Tennis</option>
-            </select>
-            <input type="text" class="filter-input" placeholder="Lapangan">
-            <input type="text" class="filter-input" placeholder="Lokasi">
-            <input type="date" class="filter-input">
-            <select class="filter-input">
-                <option>Harga</option>
-                <option>Termurah</option>
-                <option>Termahal</option>
-            </select>
-        </div>
-        <button class="btn btn--primary" style="padding: 12px 32px;">Cari</button>
+        <form action="{{ route('venue.index') }}" method="GET" id="formPencarian">
+            <div class="search-filters">
+                <select class="filter-input" name="jenis_olahraga" id="filterJenis">
+                    <option value="">Jenis Lapangan</option>
+                    <option value="Futsal" {{ request('jenis_olahraga') == 'Futsal' ? 'selected' : '' }}>Futsal</option>
+                    <option value="Badminton" {{ request('jenis_olahraga') == 'Badminton' ? 'selected' : '' }}>Badminton</option>
+                    <option value="Tennis" {{ request('jenis_olahraga') == 'Tennis' ? 'selected' : '' }}>Tennis</option>
+                </select>
+                <input type="text" class="filter-input" name="search" id="filterSearch" placeholder="Cari Lapangan/Venue..." value="{{ request('search') }}">
+                <input type="text" class="filter-input" name="lokasi" id="filterLokasi" placeholder="Lokasi (ex: Malang)" value="{{ request('lokasi') }}">
+                <select class="filter-input" name="sort_harga" id="filterHarga">
+                    <option value="">Urutkan Harga</option>
+                    <option value="termurah" {{ request('sort_harga') == 'termurah' ? 'selected' : '' }}>Termurah</option>
+                    <option value="termahal" {{ request('sort_harga') == 'termahal' ? 'selected' : '' }}>Termahal</option>
+                </select>
+            </div>
+            <button type="submit" id="btnSubmitFilter" class="btn btn--primary" style="padding: 12px 32px;">Terapkan Filter</button>
+        </form>
     </div>
 </section>
 
@@ -134,3 +135,54 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filterDOM = {
+        form: document.getElementById('formPencarian'),
+        jenis: document.getElementById('filterJenis'),
+        search: document.getElementById('filterSearch'),
+        lokasi: document.getElementById('filterLokasi'),
+        tanggal: document.getElementById('filterTanggal'),
+        harga: document.getElementById('filterHarga'),
+        btnSubmit: document.getElementById('btnSubmitFilter')
+    };
+
+    function debounce(func, delay = 800) {
+        let timerId;
+        return function (...args) {
+            clearTimeout(timerId); 
+            timerId = setTimeout(() => {
+                func.apply(this, args); 
+            }, delay);
+        };
+    }
+
+    const prosesPencarianOtomatis = debounce(() => {
+        console.log('Menjalankan pencarian otomatis...');
+        filterDOM.form.submit();
+    });
+
+    [filterDOM.search, filterDOM.lokasi].forEach(inputElement => {
+        inputElement.addEventListener('input', (e) => {
+            if(e.target.value.length > 0) {
+                e.target.style.borderColor = '#9957B3'; 
+            } else {
+                e.target.style.borderColor = '';
+            }
+            prosesPencarianOtomatis();
+        });
+    });
+
+    [filterDOM.jenis, filterDOM.harga, filterDOM.tanggal].forEach(element => {
+        if (element) { 
+            element.addEventListener('change', () => {
+                console.log(`Menyaring berdasarkan: ${element.name} = ${element.value}`);
+                filterDOM.form.submit(); 
+            });
+        }
+    });
+});
+</script>
+@endpush

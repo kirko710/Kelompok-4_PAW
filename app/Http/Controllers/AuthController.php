@@ -34,9 +34,16 @@ class AuthController extends Controller
         $role = $request->input('role', 'user');
 
         if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+
+            if ($user->role !== $role) {
+                Auth::logout();
+                return back()->with('error', "Akun ini terdaftar sebagai '{$user->role}'. Gunakan tombol Login sebagai {$user->role}!")->withInput();
+            }
+
             $request->session()->regenerate();
 
-              if ($role === 'owner') {
+            if ($user->role === 'owner') {
                 return redirect('/admin')->with('success', 'Login berhasil sebagai Owner!');
             }
             return redirect('/')->with('success', 'Login berhasil!');
