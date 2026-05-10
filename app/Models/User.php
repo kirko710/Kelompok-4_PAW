@@ -30,7 +30,13 @@ class User extends Authenticatable
         ];
     }
 
-    public function profile(){
+    public function profile()
+    {
         return $this->hasOne(UserProfile::class);
+    }
+
+    public function venues()
+    {
+        return $this->hasMany(Venue::class, 'id_user');
     }
 }

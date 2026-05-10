@@ -115,15 +115,15 @@
     <div class="venue-results">
         @forelse($venues as $venue)
         <div class="venue-result-card">
-            <div class="venue-result-card__name">{{ $venue['nama'] }}</div>
+            <div class="venue-result-card__name">{{ $venue->nama }}</div>
             <div class="venue-result-card__meta">
-                {{ $venue['lokasi'] }}<br>
-                @if($venue['deskripsi'])
-                    {{ Str::limit($venue['deskripsi'], 80) }}
+                {{ $venue->lokasi }}<br>
+                @if($venue->deskripsi)
+                    {{ Str::limit($venue->deskripsi, 80) }}
                 @endif
             </div>
             <div style="margin-top: 20px; text-align: right;">
-                <a href="{{ route('venue.show', $venue['id']) }}" class="btn btn--primary" style="padding: 10px 24px;">Check Details</a>
+                <a href="{{ route('venue.show', $venue->id) }}" class="btn btn--primary" style="padding: 10px 24px;">Check Details</a>
             </div>
         </div>
         @empty

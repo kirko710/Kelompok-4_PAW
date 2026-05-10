@@ -13,6 +13,9 @@ Route::get('/', fn () => view('home.index'))->name('home');
 Route::get('/venue', [GuestController::class, 'index'])->name('venue.index');
 Route::get('/venue/{id}', [GuestController::class, 'show'])->name('venue.show');
 
+// ============ LAPANGAN SLOTS (public, no auth required) ============
+Route::get('/lapangan/{id}/slots', [GuestController::class, 'getSlots'])->name('lapangan.slots');
+
 // ============ AUTH - GUEST ONLY (belum login) ============
 Route::middleware('guest')->group(function () {
     // Login
@@ -50,25 +53,26 @@ Route::middleware('auth')->group(function () {
     Route::post('/preferensi/save', [App\Http\Controllers\UserPreferenceController::class, 'store'])->name('preferensi.save');
     Route::get('/preferensi/all', [App\Http\Controllers\UserPreferenceController::class, 'all'])->name('preferensi.all');
 });
-// ============ ADMIN (affan) ============
-Route::middleware(['auth', 'role:owner'])->prefix('admin') ->name('admin.')->group(function () {
+// ============ ADMIN / PENGELOLA (affan) ============
+Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
-    Route::get('/venue', fn () => view('admin.venue'))->name('venue');
-    Route::get('/venue/create', fn () => view('admin.venue-create'))->name('venue.create');
 
-    // Venue
+    // Venue - Full CRUD
     Route::get('/venue', [VenueController::class, 'index'])->name('venue');
     Route::get('/venue/create', [VenueController::class, 'create'])->name('venue.create');
     Route::post('/venue', [VenueController::class, 'store'])->name('venue.store');
-    Route::get('/venue/show', fn () => view('admin.venue-show'))->name('venue.show');
-    Route::get('/lapangan', fn () => view('admin.lapangan'))->name('lapangan');
-    Route::get('/lapangan/create', fn () => view('admin.lapangan-create'))->name('lapangan.create');
+    Route::get('/venue/{id}', [VenueController::class, 'show'])->name('venue.show');
+    Route::get('/venue/{id}/edit', [VenueController::class, 'edit'])->name('venue.edit');
+    Route::put('/venue/{id}', [VenueController::class, 'update'])->name('venue.update');
+    Route::delete('/venue/{id}', [VenueController::class, 'destroy'])->name('venue.destroy');
 
-    // Lapangan
+    // Lapangan - Full CRUD
     Route::get('/lapangan', [LapanganController::class, 'index'])->name('lapangan');
     Route::get('/lapangan/create', [LapanganController::class, 'create'])->name('lapangan.create');
     Route::post('/lapangan', [LapanganController::class, 'store'])->name('lapangan.store');
-    Route::get('/lapangan/show', fn () => view('admin.lapangan-show'))->name('lapangan.show');
+    Route::get('/lapangan/{id}/edit', [LapanganController::class, 'edit'])->name('lapangan.edit');
+    Route::put('/lapangan/{id}', [LapanganController::class, 'update'])->name('lapangan.update');
+    Route::delete('/lapangan/{id}', [LapanganController::class, 'destroy'])->name('lapangan.destroy');
 
     Route::get('/jadwal', fn () => view('admin.jadwal'))->name('jadwal');
     Route::get('/pemesanan', fn () => view('admin.pemesanan'))->name('pemesanan');

@@ -2,56 +2,100 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lapangan;
+use App\Models\Pemesanan;
+use App\Models\Venue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class GuestController extends Controller
 {
-    private string $venuePath;
-    private string $lapanganPath;
-
-    public function __construct()
-    {
-        $this->venuePath    = storage_path('app/venues.json');
-        $this->lapanganPath = storage_path('app/lapangan.json');
-    }
-
-    private function readVenues(): array
-    {
-        if (!file_exists($this->venuePath)) {
-            return [];
-        }
-        $content = file_get_contents($this->venuePath);
-        return json_decode($content, true) ?? [];
-    }
-
-    private function readLapangan(): array
-    {
-        if (!file_exists($this->lapanganPath)) {
-            return [];
-        }
-        $content = file_get_contents($this->lapanganPath);
-        return json_decode($content, true) ?? [];
-    }
-
+    /**
+     * Halaman daftar venue (pencarian).
+     */
     public function index()
     {
-        $venues = $this->readVenues();
+        $venues = Venue::latest()->get();
         return view('guest.venue-search', compact('venues'));
     }
 
+    /**
+     * Halaman detail venue beserta lapangan-lapangannya.
+     */
     public function show(string $id)
     {
-        $venues = $this->readVenues();
-
-        $venue = collect($venues)->firstWhere('id', $id);
-
-        if (!$venue) {
-            abort(404);
-        }
-
-        $allLapangan = $this->readLapangan();
-        $lapangan    = array_values(array_filter($allLapangan, fn($l) => $l['venue_id'] === $id));
+        $venue = Venue::with('lapangans')->findOrFail($id);
+        $lapangan = $venue->lapangans;
 
         return view('guest.venue-detail', compact('venue', 'lapangan'));
+    }
+
+    /**
+     * API endpoint: kembalikan slot ketersediaan untuk lapangan pada tanggal tertentu.
+     * GET /lapangan/{id}/slots?tanggal=YYYY-MM-DD
+     */
+    public function getSlots(Request $request, int $id)
+    {
+        $lapangan = Lapangan::findOrFail($id);
+
+        $tanggal = $request->query('tanggal');
+        if (!$tanggal || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+            return response()->json(['error' => 'Parameter tanggal harus diisi (format: YYYY-MM-DD)'], 422);
+        }
+
+        // Jika jam operasional belum di-set, kembalikan array kosong
+        if (!$lapangan->jam_buka || !$lapangan->jam_tutup) {
+            return response()->json([
+                'lapangan_id' => $lapangan->id,
+                'tanggal'     => $tanggal,
+                'harga_sewa'  => (float) $lapangan->harga_sewa,
+                'slots'       => [],
+                'jam_belum_diset' => true,
+            ]);
+        }
+
+        // Ambil semua pemesanan aktif/confirmed/pending pada lapangan & tanggal ini
+        $pemesanans = Pemesanan::where('id_lapangan', $lapangan->id)
+            ->where('tanggal_pesan', $tanggal)
+            ->whereNotIn('status_pesanan', ['cancelled'])
+            ->get(['waktu_mulai', 'waktu_selesai']);
+
+        // Generate slot per jam
+        $jamBuka   = Carbon::parse($lapangan->jam_buka);
+        $jamTutup  = Carbon::parse($lapangan->jam_tutup);
+        $slots     = [];
+        $current   = $jamBuka->copy();
+
+        while ($current->lt($jamTutup)) {
+            $mulai    = $current->format('H:i');
+            $selesai  = $current->copy()->addHour()->format('H:i');
+
+            // Cek apakah slot ini overlap dengan pemesanan yang ada
+            $terpesan = false;
+            foreach ($pemesanans as $p) {
+                // Overlap jika mulai slot < waktu_selesai pemesanan DAN selesai slot > waktu_mulai pemesanan
+                if ($mulai < $p->waktu_selesai && $selesai > $p->waktu_mulai) {
+                    $terpesan = true;
+                    break;
+                }
+            }
+
+            $slots[] = [
+                'mulai'    => $mulai,
+                'selesai'  => $selesai,
+                'label'    => "{$mulai} - {$selesai}",
+                'tersedia' => !$terpesan,
+            ];
+
+            $current->addHour();
+        }
+
+        return response()->json([
+            'lapangan_id' => $lapangan->id,
+            'tanggal'     => $tanggal,
+            'harga_sewa'  => (float) $lapangan->harga_sewa,
+            'slots'       => $slots,
+        ]);
     }
 }
