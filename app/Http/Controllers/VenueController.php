@@ -14,7 +14,7 @@ class VenueController extends Controller
      */
     public function index()
     {
-        $venues = Venue::where('id_user', Auth::id())->latest()->get();
+        $venues = Venue::byUser(Auth::id())->latest()->get();
         return view('admin.venue', compact('venues'));
     }
 
@@ -38,9 +38,12 @@ class VenueController extends Controller
             'foto'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $fotoPath = null;
         if ($request->hasFile('foto')) {
-            $fotoPath = $request->file('foto')->store('venues', 'public');
+            $file = $request->file('foto');
+            $fileName = $file->hashName();
+            $file->storeAs('venues', $fileName, 'public');
+            
+            $fotoPath = $fileName;
         }
 
         Venue::create([
@@ -54,18 +57,12 @@ class VenueController extends Controller
         return redirect()->route('admin.venue')->with('success', 'Venue berhasil ditambahkan!');
     }
 
-    /**
-     * Detail venue beserta daftar lapangannya.
-     */
     public function show($id)
     {
         $venue = Venue::where('id_user', Auth::id())->with('lapangans')->findOrFail($id);
         return view('admin.venue-show', compact('venue'));
     }
-
-    /**
-     * Form edit venue.
-     */
+    
     public function edit($id)
     {
         $venue = Venue::where('id_user', Auth::id())->findOrFail($id);
@@ -102,7 +99,7 @@ class VenueController extends Controller
 
         $venue->update($data);
 
-        return redirect()->route('admin.venue')->with('success', 'Venue berhasil diperbarui!');
+        return redirect()->route('admin.venue.show', $venue->id)->with('success', 'Venue berhasil diperbarui!');
     }
 
     /**

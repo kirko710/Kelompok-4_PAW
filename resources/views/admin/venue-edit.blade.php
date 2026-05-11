@@ -41,7 +41,7 @@
                         @if($venue->foto)
                             <img
                                 id="foto-preview"
-                                src="{{ Storage::url($venue->foto) }}"
+                                src="{{ $venue->foto_url }}"
                                 alt="{{ $venue->nama }}"
                                 class="w-full h-full object-cover"
                             >
@@ -118,7 +118,7 @@
 
                     <div class="flex justify-end gap-3 pt-4">
                         <a
-                            href="{{ route('admin.venue') }}"
+                            href="{{ route('admin.venue.show', $venue->id) }}"
                             class="px-6 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
                         >
                             Batal

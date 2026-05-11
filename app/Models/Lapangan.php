@@ -24,25 +24,32 @@ class Lapangan extends Model
         'harga_sewa' => 'decimal:2',
     ];
 
-    /**
-     * Lapangan dimiliki oleh sebuah Venue.
-     */
     public function venue()
     {
         return $this->belongsTo(Venue::class, 'id_venue');
     }
 
-    /**
-     * Lapangan memiliki banyak Pemesanan.
-     */
     public function pemesanans()
     {
         return $this->hasMany(Pemesanan::class, 'id_lapangan');
     }
 
-    /**
-     * Cek apakah lapangan memiliki pemesanan aktif/pending.
-     */
+    
+    public function scopeByJenisOlahraga($query, $jenis)
+    {
+        return $query->where('jenis_olahraga', $jenis);
+    }
+
+    public function scopeByVenue($query, $venueId)
+    {
+        return $query->where('id_venue', $venueId);
+    }
+
+    public function getHasFotoAttribute()
+    {
+        return !is_null($this->foto);
+    }
+    
     public function hasActivePemesanan(): bool
     {
         return $this->pemesanans()

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Venue extends Model
 {
@@ -42,15 +43,6 @@ class Venue extends Model
         return $this->hasManyThrough(Pemesanan::class, Lapangan::class, 'id_venue', 'id_lapangan');
     }
 
-    public function getFotoUrlAttribute()
-    {
-        if (!$this->foto) {
-            return null;
-        }
-        
-        return asset('storage/venues/' . $this->foto);
-    }
-
     public function scopeByUser($query, $userId)
     {
         return $query->where('id_user', $userId);
@@ -86,5 +78,10 @@ class Venue extends Model
         } else {
             $this->attributes['foto'] = $value;
         }
+    }
+
+    public function getFotoUrlAttribute()
+    {
+        return $this->foto ? Storage::url('venues/' . $this->foto) : null;
     }
 }

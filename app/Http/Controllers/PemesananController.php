@@ -16,14 +16,14 @@ class PemesananController extends Controller
         $request->validate([
             'id_lapangan'   => 'required|exists:lapangans,id',
             'tanggal_pesan' => 'required|date|after_or_equal:today',
-            'waktu_mulai'   => 'required|date_format:H:i',
-            'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
+            'waktu_mulai'   => 'required|date_format:H:i:s',
+            'waktu_selesai' => 'required|date_format:H:i:s|after:waktu_mulai',
         ]);
 
         $lapangan = Lapangan::findOrFail($request->id_lapangan);
 
-        $mulai = Carbon::createFromFormat('H:i', $request->waktu_mulai);
-        $selesai = Carbon::createFromFormat('H:i', $request->waktu_selesai);
+        $mulai = Carbon::createFromFormat('H:i:s', $request->waktu_mulai);
+        $selesai = Carbon::createFromFormat('H:i:s', $request->waktu_selesai);
         $durasiMenit = $mulai->diffInMinutes($selesai);
         $durasiJam = $durasiMenit / 60;
 

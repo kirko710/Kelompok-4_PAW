@@ -58,7 +58,7 @@
                             <div class="h-40 rounded-xl overflow-hidden bg-gray-200">
                                 @if($venue->foto)
                                     <img
-                                        src="{{ Storage::url($venue->foto) }}"
+                                        src="{{ $venue->foto_url }}"
                                         alt="{{ $venue->nama }}"
                                         class="w-full h-full object-cover"
                                     >

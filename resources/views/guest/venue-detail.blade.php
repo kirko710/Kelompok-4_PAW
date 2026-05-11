@@ -87,16 +87,13 @@
     transform: scale(1.02);
     box-shadow: 0 2px 8px rgba(22,163,74,0.3);
 }
-.slot-taken {
-    background: #f5f5f5;
-    border-color: #e5e5e5;
-    color: #aaa;
-    cursor: not-allowed;
-}
+.slot-taken { cursor: not-allowed; opacity: 0.9; }
+.slot-pending { background-color: #fef9c3; border-color: #fde047; color: #854d0e; }
+.slot-pending .slot-badge { color: #a16207; }
+.slot-booked { background-color: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
 .slot-label { display: block; font-size: 12px; }
 .slot-badge { font-size: 10px; margin-top: 3px; opacity: 0.8; }
 
-/* Summary bar */
 .booking-summary {
     display: none;
     background: white;
@@ -148,7 +145,7 @@
 {{-- Hero Foto Venue --}}
 <div class="venue-hero">
     @if($venue->foto)
-        <img src="{{ Storage::url($venue->foto) }}" alt="{{ $venue->nama }}">
+        <img src="{{ $venue->foto_url }}" alt="{{ $venue->nama }}" class="w-full h-full object-cover">
     @else
         <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=1400&q=80" alt="{{ $venue->nama }}">
     @endif
@@ -219,14 +216,17 @@
                         <strong id="summary-harga-{{ $court->id }}">Rp 0</strong>
                     </div>
                     @auth
-                        <form method="GET" action="{{ route('pemesanan.detail') }}" id="form-{{ $court->id }}">
+                        <form method="POST" action="{{ route('pemesanan.store') }}" id="form-{{ $court->id }}">
+                            @csrf
                             <input type="hidden" name="id_lapangan" value="{{ $court->id }}">
                             <input type="hidden" name="tanggal_pesan" id="inp-tanggal-{{ $court->id }}">
                             <input type="hidden" name="waktu_mulai" id="inp-mulai-{{ $court->id }}">
                             <input type="hidden" name="waktu_selesai" id="inp-selesai-{{ $court->id }}">
+                            {{-- Total harga berguna jika controller kamu membutuhkannya --}}
                             <input type="hidden" name="total_harga" id="inp-total-{{ $court->id }}">
+                            
                             <button type="submit" class="btn-cta" id="btn-pesan-{{ $court->id }}">
-                                Pesan Sekarang
+                                Lanjutkan ke Pembayaran
                             </button>
                         </form>
                     @else
@@ -296,9 +296,10 @@ function renderSlots(lapanganId, tanggal, slots) {
                 <span class="slot-badge">✓ Tersedia</span>
             </div>`;
         } else {
-            html += `<div class="slot-card slot-taken" title="Slot ini sudah terpesan">
+            const statusClass = (slot.status_teks === 'Sedang Dipesan') ? 'slot-pending' : 'slot-booked';
+            html += `<div class="slot-card slot-taken ${statusClass}" title="${slot.status_teks}">
                 <span class="slot-label">${slot.label}</span>
-                <span class="slot-badge">✗ Terpesan</span>
+                <span class="slot-badge">✗ ${slot.status_teks}</span>
             </div>`;
         }
     });

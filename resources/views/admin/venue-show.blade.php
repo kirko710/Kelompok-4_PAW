@@ -33,7 +33,7 @@
             <div class="md:w-1/3">
                 <div class="h-48 rounded-xl overflow-hidden bg-gray-200">
                     @if($venue->foto)
-                        <img src="{{ Storage::url($venue->foto) }}" alt="{{ $venue->nama }}" class="w-full h-full object-cover">
+                        <img src="{{ $venue->foto_url }}" alt="{{ $venue->nama }}" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center bg-purple-50">
                             <svg class="w-16 h-16 text-purple-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">

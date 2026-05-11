@@ -14,9 +14,39 @@ class GuestController extends Controller
     /**
      * Halaman daftar venue (pencarian).
      */
-    public function index()
+    public function index(Request $request)
     {
-        $venues = Venue::latest()->get();
+        $search = $request->query('search');
+        $lokasi = $request->query('lokasi');
+        $jenis  = $request->query('jenis_olahraga');
+        $sort   = $request->query('sort_harga');
+
+        $query = Venue::active()->with('lapangans');
+
+        $query->when($search, function ($q) use ($search) {
+            return $q->where('nama', 'like', "%{$search}%");
+        });
+
+        $query->when($lokasi, function ($q) use ($lokasi) {
+            return $q->where('lokasi', 'like', "%{$lokasi}%");
+        });
+
+        $query->when($jenis, function ($q) use ($jenis) {
+            return $q->whereHas('lapangans', function ($sq) use ($jenis) {
+                $sq->where('jenis_olahraga', $jenis);
+            });
+        });
+
+        $query->when($sort, function ($q) use ($sort) {
+            if ($sort === 'termurah') {
+                return $q->withMin('lapangans', 'harga_sewa')->orderBy('lapangans_min_harga_sewa', 'asc');
+            } elseif ($sort === 'termahal') {
+                return $q->withMax('lapangans', 'harga_sewa')->orderBy('lapangans_max_harga_sewa', 'desc');
+            }
+        });
+
+        $venues = $query->latest()->get();
+
         return view('guest.venue-search', compact('venues'));
     }
 
@@ -25,7 +55,7 @@ class GuestController extends Controller
      */
     public function show(string $id)
     {
-        $venue = Venue::with('lapangans')->findOrFail($id);
+        $venue = Venue::with('lapangans')->active()->findOrFail($id);
         $lapangan = $venue->lapangans;
 
         return view('guest.venue-detail', compact('venue', 'lapangan'));
@@ -59,7 +89,7 @@ class GuestController extends Controller
         $pemesanans = Pemesanan::where('id_lapangan', $lapangan->id)
             ->where('tanggal_pesan', $tanggal)
             ->whereNotIn('status_pesanan', ['cancelled'])
-            ->get(['waktu_mulai', 'waktu_selesai']);
+            ->get(['waktu_mulai', 'waktu_selesai','status_pesanan']);
 
         // Generate slot per jam
         $jamBuka   = Carbon::parse($lapangan->jam_buka);
@@ -68,15 +98,28 @@ class GuestController extends Controller
         $current   = $jamBuka->copy();
 
         while ($current->lt($jamTutup)) {
+            $next = $current->copy()->addHour();
             $mulai    = $current->format('H:i');
-            $selesai  = $current->copy()->addHour()->format('H:i');
+            $selesai  = $next->format('H:i');
 
             // Cek apakah slot ini overlap dengan pemesanan yang ada
             $terpesan = false;
+            $statusTeks = 'Tersedia';
             foreach ($pemesanans as $p) {
                 // Overlap jika mulai slot < waktu_selesai pemesanan DAN selesai slot > waktu_mulai pemesanan
-                if ($mulai < $p->waktu_selesai && $selesai > $p->waktu_mulai) {
+                $pMulai = Carbon::parse($p->waktu_mulai, $current->timezone);
+                $pSelesai = Carbon::parse($p->waktu_selesai, $current->timezone);
+
+                // Cek Overlap: (Mulai Slot < Selesai Pesanan) DAN (Selesai Slot > Mulai Pesanan)
+                if ($current->lt($pSelesai) && $next->gt($pMulai)) {
                     $terpesan = true;
+
+                    if ($p->status_pesanan === 'pending') {
+                        $statusTeks = 'Sedang Dipesan';
+                    } else {
+                        $statusTeks = 'Terpesan';
+                    }
+
                     break;
                 }
             }
@@ -86,6 +129,7 @@ class GuestController extends Controller
                 'selesai'  => $selesai,
                 'label'    => "{$mulai} - {$selesai}",
                 'tersedia' => !$terpesan,
+                'status_teks' => $statusTeks,
             ];
 
             $current->addHour();
