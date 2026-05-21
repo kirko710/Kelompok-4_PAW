@@ -5,9 +5,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\LapanganController;
-use App\Http\Controllers\PemesananController;
-use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\AjaxUserController;
 
+Route::get('/ajax/users/search', [AjaxUserController::class, 'search'])
+    ->name('ajax.users.search');
+
+Route::view('/ajax-demo', 'ajax-demo');
 // ============ HOME (yoga) ============
 Route::get('/', fn () => view('home.index'))->name('home');
 
