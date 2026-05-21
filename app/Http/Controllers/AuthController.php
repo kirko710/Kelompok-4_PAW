@@ -158,7 +158,7 @@ class AuthController extends Controller
             return redirect('/register');
         }
 
-        // Create User ke database
+        // Sekarang baru simpan ke database
         $user = User::create([
             'name' => $registerData['name'],
             'email' => $registerData['email'],
