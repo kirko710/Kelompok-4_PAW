@@ -11,6 +11,7 @@ Route::get('/ajax/users/search', [AjaxUserController::class, 'search'])
     ->name('ajax.users.search');
 
 Route::view('/ajax-demo', 'ajax-demo');
+
 // ============ HOME (yoga) ============
 Route::get('/', fn () => view('home.index'))->name('home');
 
