@@ -107,8 +107,40 @@ class PemesananController extends Controller
         if ($currentStatus !== 'all') {
             $query->where('status_pesanan', $currentStatus);
         }
-        
+
         $riwayat = $query->get();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $mappedRiwayat = $riwayat->map(function ($item) {
+                $statusText = '';
+                if ($item->status_pesanan == 'pending') $statusText = 'Menunggu';
+                elseif ($item->status_pesanan == 'confirmed') $statusText = 'Dikonfirmasi';
+                elseif ($item->status_pesanan == 'completed') $statusText = 'Selesai';
+                else $statusText = 'Dibatalkan';
+
+                return [
+                    'id' => $item->id,
+                    'status_pesanan' => $item->status_pesanan,
+                    'status_text' => $statusText,
+                    'venue_nama' => $item->lapangan->venue->nama ?? 'Venue',
+                    'lapangan_nama' => $item->lapangan->nama ?? 'Lapangan',
+                    // Format waktu & angka langsung dari backend agar rapi
+                    'tanggal_main' => \Carbon\Carbon::parse($item->tanggal_pesan)->translatedFormat('d F Y'),
+                    'waktu_mulai' => \Carbon\Carbon::parse($item->waktu_mulai)->format('H:i'),
+                    'waktu_selesai' => \Carbon\Carbon::parse($item->waktu_selesai)->format('H:i'),
+                    'id_pesanan_format' => '#ORD-' . str_pad($item->id, 5, '0', STR_PAD_LEFT),
+                    'total_harga_format' => number_format($item->total_harga * 1.12, 0, ',', '.'),
+                    // URL Actions
+                    'detail_url' => route('riwayat.detail', $item->id),
+                    'bayar_url' => route('pembayaran.show', $item->id),
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $mappedRiwayat
+            ]);
+        }
 
         return view('penyewa.riwayat', compact('riwayat', 'currentStatus'));
     }

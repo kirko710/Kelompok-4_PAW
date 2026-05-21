@@ -47,6 +47,24 @@ class GuestController extends Controller
 
         $venues = $query->latest()->get();
 
+        if ($request->ajax() || $request->wantsJson()) {
+            $mappedVenues = $venues->map(function ($venue) {
+                return [
+                    'id' => $venue->id,
+                    'nama' => $venue->nama,
+                    'lokasi' => $venue->lokasi,
+                    'deskripsi' => $venue->deskripsi ? \Illuminate\Support\Str::limit($venue->deskripsi, 80) : null,
+                    'detail_url' => route('venue.show', $venue->id)
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $mappedVenues
+            ]);
+        }
+
+        // Jika bukan AJAX (Load pertama kali), kembalikan View
         return view('guest.venue-search', compact('venues'));
     }
 

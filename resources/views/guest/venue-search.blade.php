@@ -146,10 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
         lokasi: document.getElementById('filterLokasi'),
         tanggal: document.getElementById('filterTanggal'),
         harga: document.getElementById('filterHarga'),
+        resultsContainer: document.querySelector('.venue-results'),
         btnSubmit: document.getElementById('btnSubmitFilter')
     };
 
-    function debounce(func, delay = 800) {
+    function debounce(func, delay = 600) {
         let timerId;
         return function (...args) {
             clearTimeout(timerId); 
@@ -159,12 +160,67 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    const fetchVenuesJSON = async () => {
+        filterDOM.resultsContainer.innerHTML = '<div style="grid-column: span 2; text-align: center; padding: 60px 0; color: #666;">Sedang mencari venue...</div>';
+
+        const formData = new FormData(filterDOM.form);
+        const params = new URLSearchParams(formData).toString();
+        const url = `${filterDOM.form.action}?${params}`;
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            const result = await response.json();
+            const venues = result.data;
+            let htmlContent = '';
+
+            if (venues.length === 0) {
+                htmlContent = `
+                    <div style="grid-column: span 2; text-align: center; padding: 60px 0; color: #999;">
+                        Belum ada venue yang tersedia saat ini.
+                    </div>`;
+            } else {
+                venues.forEach(venue => {
+                    const deskripsiTeks = venue.deskripsi ? venue.deskripsi : '';
+                    
+                    htmlContent += `
+                    <div class="venue-result-card">
+                        <div class="venue-result-card__name">${venue.nama}</div>
+                        <div class="venue-result-card__meta">
+                            ${venue.lokasi}<br>
+                            ${deskripsiTeks}
+                        </div>
+                        <div style="margin-top: 20px; text-align: right;">
+                            <a href="${venue.detail_url}" class="btn btn--primary" style="padding: 10px 24px;">Check Details</a>
+                        </div>
+                    </div>`;
+                });
+            }
+
+            filterDOM.resultsContainer.innerHTML = htmlContent;
+            window.history.pushState({}, '', url);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            filterDOM.resultsContainer.innerHTML = '<div style="grid-column: span 2; text-align: center; color: red;">Gagal memuat data. Silakan coba lagi.</div>';
+        }
+    };
+
     const prosesPencarianOtomatis = debounce(() => {
-        console.log('Menjalankan pencarian otomatis...');
-        filterDOM.form.submit();
+        fetchVenuesJSON();
+    });
+
+    filterDOM.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchVenuesJSON();
     });
 
     [filterDOM.search, filterDOM.lokasi].forEach(inputElement => {
+        if(!inputElement) return;
         inputElement.addEventListener('input', (e) => {
             if(e.target.value.length > 0) {
                 e.target.style.borderColor = '#9957B3'; 
@@ -175,11 +231,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    [filterDOM.jenis, filterDOM.harga, filterDOM.tanggal].forEach(element => {
+    [filterDOM.jenis, filterDOM.harga].forEach(element => {
         if (element) { 
             element.addEventListener('change', () => {
-                console.log(`Menyaring berdasarkan: ${element.name} = ${element.value}`);
-                filterDOM.form.submit(); 
+                fetchVenuesJSON(); 
             });
         }
     });
