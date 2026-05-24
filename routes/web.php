@@ -7,6 +7,7 @@ use App\Http\Controllers\VenueController;
 use App\Http\Controllers\LapanganController;
 use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AjaxUserController;
 
 Route::get('/ajax/users/search', [AjaxUserController::class, 'search'])
@@ -15,7 +16,7 @@ Route::get('/ajax/users/search', [AjaxUserController::class, 'search'])
 Route::view('/ajax-demo', 'ajax-demo');
 
 // ============ HOME (yoga) ============
-Route::get('/', fn () => view('home.index'))->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // ============ AUTH - GUEST ONLY (belum login) ============
 Route::middleware('guest')->group(function () {
