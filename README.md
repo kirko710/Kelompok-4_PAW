@@ -34,57 +34,74 @@
 
 ### 1. Clone Repository
 
-```bash git clone <repository-url> cd courtee ```
+```
+git clone <repository-url>
+cd courtee
+```
 
 ### 2. Install Dependencies
 
-```bash composer install npm install ```
+```
+composer install
+npm install
+```
 
 ### 3. Setup Environment File
 
-```bash cp .env.example .env ```
+```
+cp .env.example .env
+```
 
 Kemudian edit file `.env` dan sesuaikan konfigurasi database:
 
-```env DB_CONNECTION=mysql DB_HOST=**127**.0.0.1 DB_PORT=**3306** DB_DATABASE=courtee DB_USERNAME=root DB_PASSWORD= ```
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=courtee
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
 ### 4. Generate Application Key
 
-```bash php artisan key:generate ```
+```
+php artisan key:generate
+```
 
 ### 5. Jalankan Database Migration
 
-```bash php artisan migrate ```
+```
+php artisan migrate
+```
 
 ### 6. Seed Data Dummy (Opsional)
 
-```bash php artisan db:seed ```
+```
+php artisan db:seed
+```
 
 ### 7. Compile Assets
 
-```bash npm run dev ```
+```
+npm run dev 
+```
 
 Atau untuk production:
 
-```bash npm run build ```
+```
+npm run build
+```
 
 ## Menjalankan Aplikasi
 
 ### Mode Development
 
-```bash php artisan serve ```
+```
+php artisan serve
+```
 
-Aplikasi akan berjalan di `[http://localhost:**8000**`](http://localhost:**8000**`)
-
-### Mode Production
-
-Pastikan `APP_ENV` di `.env` diubah menjadi `production` dan jalankan:
-
-```bash php artisan serve --env=production ```
-
-## Struktur Folder
-
-``` courtee/ ├── app/ │   ├── Http/ │   │   ├── Controllers/ │   │   ├── Middleware/ │   │   └── Requests/ │   ├── Models/ │   └── Services/ ├── database/ │   ├── migrations/ │   └── seeders/ ├── resources/ │   ├── views/ │   │   ├── auth/ │   │   ├── customer/ │   │   └── owner/ │   └── css/ ├── routes/ │   └── web.php ├── storage/ │   ├── app/ │   └── logs/ └── tests/ ```
+Aplikasi akan berjalan di `[http://localhost:8000]`(http://localhost:8000)
 
 ## Konfigurasi Penting
 
@@ -102,9 +119,9 @@ Tabel utama dalam sistem:
 - `users` - Data pengguna (penyewa & pengelola)
 - `user_profiles` - Profil detail pengguna
 - `venues` - Data venue/lokasi lapangan
-- `fields` - Data lapangan olahraga
-- `bookings` - Data pemesanan
-- `payments` - Data transaksi pembayaran
+- `lapangans` - Data lapangan olahraga
+- `pemesanans` - Data pemesanan
+- `pembayarans` - Data transaksi pembayaran
 
 ## Akun Test
 
@@ -124,15 +141,23 @@ Anda dapat membuat akun baru melalui halaman register, atau gunakan data seeder 
 
 ### Menjalankan Tests
 
-```bash php artisan test ```
+```
+php artisan test
+```
 
 ### Membersihkan Cache
 
-```bash php artisan cache:clear php artisan config:clear php artisan view:clear ```
+```
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+```
 
 ### Generate Dokumentasi API
 
-```bash php artisan ide-helper:generate ```
+```
+php artisan ide-helper:generate
+```
 
 ## Troubleshooting
 
@@ -140,19 +165,27 @@ Anda dapat membuat akun baru melalui halaman register, atau gunakan data seeder 
 
 **Solusi:** Pastikan database sudah dibuat terlebih dahulu. Jika perlu, reset database:
 
-```bash php artisan migrate:refresh --seed ```
+```
+php artisan migrate:refresh --seed
+```
 
 ### Masalah: Storage Permission Error
 
 **Solusi:** Ubah permission folder storage:
 
-```bash chmod -R **755** storage chmod -R **755** bootstrap/cache ```
+```
+chmod -R 755 storage 
+chmod -R 755 bootstrap/cache
+```
 
 ### Masalah: CSRF Token Mismatch
 
 **Solusi:** Clear session dan cache:
 
-```bash php artisan cache:clear php artisan session:clear ```
+```
+php artisan cache:clear 
+php artisan session:clear
+```
 
 ## Tim Pengembang
 
