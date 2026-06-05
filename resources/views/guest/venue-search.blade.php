@@ -97,7 +97,11 @@
                     <option value="">Jenis Lapangan</option>
                     <option value="Futsal" {{ request('jenis_olahraga') == 'Futsal' ? 'selected' : '' }}>Futsal</option>
                     <option value="Badminton" {{ request('jenis_olahraga') == 'Badminton' ? 'selected' : '' }}>Badminton</option>
-                    <option value="Tennis" {{ request('jenis_olahraga') == 'Tennis' ? 'selected' : '' }}>Tennis</option>
+                    <option value="Tenis" {{ request('jenis_olahraga') == 'Tennis' ? 'selected' : '' }}>Tenis</option>
+                    <option value="Basket" {{ request('jenis_olahraga') == 'Basket' ? 'selected' : '' }}>Basket</option>
+                    <option value="Voli" {{ request('jenis_olahraga') == 'Voli' ? 'selected' : '' }}>Voli</option>
+                    <option value="Renang" {{ request('jenis_olahraga') == 'Renang' ? 'selected' : '' }}>Renang</option>
+                    <option value="Gym" {{ request('jenis_olahraga') == 'Gym' ? 'selected' : '' }}>Gym</option>
                 </select>
                 <input type="text" class="filter-input" name="search" id="filterSearch" placeholder="Cari Lapangan/Venue..." value="{{ request('search') }}">
                 <input type="text" class="filter-input" name="lokasi" id="filterLokasi" placeholder="Lokasi (ex: Malang)" value="{{ request('lokasi') }}">
