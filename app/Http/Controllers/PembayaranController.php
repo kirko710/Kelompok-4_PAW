@@ -80,43 +80,34 @@ class PembayaranController extends Controller
     // Menampilkan halaman daftar pembayaran yang butuh diverifikasi admin
     public function daftarVerifikasi()
     {
-        // Menggunakan scope 'byStatus' dari model untuk memfilter yang statusnya 'pending'
-        // Eager load relasi pemesanan, user, dan lapangan untuk mencegah N+1 Query problem di view
-        $pembayarans = Pembayaran::with(['pemesanan.user', 'pemesanan.lapangan'])
-            ->byStatus('pending')
+        $pemesanans = Pemesanan::with(['user', 'lapangan', 'pembayaran'])
+            ->whereHas('pembayaran', fn($q) => $q->where('status_bayar', 'pending'))
+            ->whereHas('lapangan.venue', fn($q) => $q->where('id_user', Auth::id()))
             ->latest()
             ->get();
 
-        return view('admin.verifikasi', compact('pembayarans'));
+        return view('admin.verifikasi', compact('pemesanans'));
     }
 
     // Memproses verifikasi (Terima/Tolak) oleh Admin
     public function prosesVerifikasi(Request $request, $id)
     {
-        $request->validate([
-            'aksi' => 'required|in:terima,tolak',
-        ]);
+        // Support both 'aksi' and 'action' field names
+        $aksi = $request->input('action', $request->input('aksi'));
 
-        $pembayaran = Pembayaran::findOrFail($id);
-        $pemesanan = $pembayaran->pemesanan; // Memanggil relasi pemesanan terkait
+        $pemesanan  = Pemesanan::findOrFail($id);
+        $pembayaran = $pemesanan->pembayaran;
 
-        if ($request->aksi === 'terima') {
-            // Jika diterima, ubah status bayar menjadi paid
-            $pembayaran->update(['status_bayar' => 'paid']);
-            // Opsional: sinkronisasi update status di tabel pemesanan menjadi confirmed
+        if ($aksi === 'terima') {
+            $pembayaran?->update(['status_bayar' => 'paid']);
             $pemesanan->update(['status_pesanan' => 'confirmed']);
-
-            $pesan = 'Pembayaran berhasil diverifikasi (Diterima).';
+            $pesan = 'Pembayaran berhasil diverifikasi.';
         } else {
-            // Jika ditolak, ubah status bayar menjadi failed
-            $pembayaran->update(['status_bayar' => 'failed']);
-            // Sinkronisasi status pesanan menjadi cancelled
+            $pembayaran?->update(['status_bayar' => 'failed']);
             $pemesanan->update(['status_pesanan' => 'cancelled']);
-
             $pesan = 'Pembayaran ditolak.';
         }
 
-        return redirect()->route('admin.verifikasi')
-            ->with('success', $pesan);
+        return redirect()->route('admin.verifikasi')->with('success', $pesan);
     }
 }

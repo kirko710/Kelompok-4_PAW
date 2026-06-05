@@ -154,9 +154,87 @@ class PemesananController extends Controller
     // Menampilkan semua daftar pemesanan (Riwayat Keseluruhan)
     public function adminIndex()
     {
-        // Menarik data pemesanan beserta user dan lapangannya (Eager Loading untuk menghindari N+1 query)
-        $pemesanans = Pemesanan::with(['user', 'lapangan'])->latest()->get();
+        // Eager Loading user, lapangan, dan pembayaran untuk menghindari N+1 query
+        $pemesanans = Pemesanan::with(['user', 'lapangan', 'pembayaran'])->latest()->get();
         return view('admin.pemesanan', compact('pemesanans'));
+    }
+
+    // Endpoint AJAX untuk filter & search daftar pemesanan (return JSON)
+    public function adminFilter(Request $request)
+    {
+        $query = Pemesanan::with(['user', 'lapangan', 'pembayaran'])
+            ->latest()
+            // Filter: nama pelanggan (LIKE)
+            ->when($request->search, function ($q) use ($request) {
+                $q->whereHas('user', function ($uq) use ($request) {
+                    $uq->where('name', 'LIKE', '%' . $request->search . '%');
+                });
+            })
+            // Filter: status_pesanan
+            ->when($request->status && $request->status !== 'all', function ($q) use ($request) {
+                $q->where('status_pesanan', $request->status);
+            })
+            // Filter: status_bayar (via relasi pembayaran)
+            ->when($request->pembayaran && $request->pembayaran !== 'all', function ($q) use ($request) {
+                $filterBayar = $request->pembayaran === 'paid' ? 'paid' : ['unpaid', 'pending', 'failed'];
+                $q->whereHas('pembayaran', function ($pq) use ($filterBayar) {
+                    if (is_array($filterBayar)) {
+                        $pq->whereIn('status_bayar', $filterBayar);
+                    } else {
+                        $pq->where('status_bayar', $filterBayar);
+                    }
+                });
+            })
+            // Filter: rentang tanggal (N hari terakhir)
+            ->when($request->rentang && $request->rentang !== 'all', function ($q) use ($request) {
+                $hari = (int) $request->rentang;
+                $q->where('tanggal_pesan', '>=', Carbon::now()->subDays($hari)->toDateString());
+            });
+
+        $pemesanans = $query->get();
+
+        $data = $pemesanans->map(function ($p) {
+            // Hitung durasi dari selisih waktu_mulai dan waktu_selesai
+            $mulai   = Carbon::parse($p->waktu_mulai);
+            $selesai = Carbon::parse($p->waktu_selesai);
+            $durasi  = $mulai->diffInHours($selesai);
+
+            // Label status pembayaran
+            $statusBayar      = optional($p->pembayaran)->status_bayar ?? 'unpaid';
+            $statusBayarLabel = $statusBayar === 'paid' ? 'Lunas' : 'Belum Lunas';
+
+            // Label status pesanan
+            $labelMap = [
+                'pending'   => 'Menunggu',
+                'confirmed' => 'Dikonfirmasi',
+                'completed' => 'Selesai',
+                'cancelled' => 'Dibatalkan',
+            ];
+            $statusPesananLabel = $labelMap[$p->status_pesanan] ?? ucfirst($p->status_pesanan);
+
+            // Tombol Batalkan hanya muncul jika status masih bisa dibatalkan
+            $bisaBatalkan = in_array($p->status_pesanan, ['pending', 'confirmed']);
+
+            return [
+                'id'                  => $p->id,
+                'nama_pelanggan'      => optional($p->user)->name ?? '-',
+                'lapangan'            => optional($p->lapangan)->nama ?? '-',
+                'tanggal'             => Carbon::parse($p->tanggal_pesan)->translatedFormat('d F Y'),
+                'waktu_mulai'         => Carbon::parse($p->waktu_mulai)->format('H:i'),
+                'waktu_selesai'       => Carbon::parse($p->waktu_selesai)->format('H:i'),
+                'durasi'              => $durasi . ' Jam',
+                'status_bayar'        => $statusBayar,
+                'status_bayar_label'  => $statusBayarLabel,
+                'status_pesanan'      => $p->status_pesanan,
+                'status_pesanan_label'=> $statusPesananLabel,
+                'bisa_batalkan'       => $bisaBatalkan,
+            ];
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $data,
+        ]);
     }
 
     // Menampilkan daftar pesanan yang butuh verifikasi pembayaran
@@ -191,14 +269,61 @@ class PemesananController extends Controller
     }
 
     // Menampilkan daftar pesanan yang dibatalkan
-    public function adminPembatalanIndex()
+    public function adminPembatalanIndex(Request $request)
     {
-        // Menampilkan data pemesanan yang statusnya dibatalkan
-        $pemesanans = Pemesanan::with(['user', 'lapangan'])
-            ->byStatus('cancelled') // Menggunakan local scope byStatus dari model Pemesanan
-            ->latest()
-            ->get();
+        $userId = Auth::id();
+
+        $query = Pemesanan::with(['user', 'lapangan', 'pembayaran'])
+            ->byStatus('cancelled')
+            ->whereHas('lapangan.venue', fn($q) => $q->where('id_user', $userId))
+            ->latest();
+
+        // Filter opsional
+        if ($request->filled('cari')) {
+            $cari = $request->cari;
+            $query->whereHas('user', fn($q) => $q->where('name', 'LIKE', "%{$cari}%"));
+        }
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal_pesan', $request->tanggal);
+        }
+
+        $pemesanans = $query->get();
 
         return view('admin.pembatalan', compact('pemesanans'));
+    }
+
+    // Admin membatalkan pesanan (dari halaman daftar pemesanan)
+    public function adminBatalkan(Request $request, $id)
+    {
+        $pemesanan = Pemesanan::whereHas('lapangan.venue', fn($q) => $q->where('id_user', Auth::id()))
+            ->findOrFail($id);
+
+        if (!in_array($pemesanan->status_pesanan, ['pending', 'confirmed'])) {
+            return response()->json(['message' => 'Pesanan tidak dapat dibatalkan.'], 422);
+        }
+
+        $pemesanan->update(['status_pesanan' => 'cancelled']);
+
+        if ($pemesanan->pembayaran) {
+            $pemesanan->pembayaran->update(['status_bayar' => 'failed']);
+        }
+
+        return response()->json(['message' => 'Pesanan berhasil dibatalkan.']);
+    }
+
+    // Admin menandai refund sebagai selesai
+    public function adminProsesRefund(Request $request, $id)
+    {
+        $pemesanan = Pemesanan::with('pembayaran')
+            ->whereHas('lapangan.venue', fn($q) => $q->where('id_user', Auth::id()))
+            ->byStatus('cancelled')
+            ->findOrFail($id);
+
+        // Tandai pembayaran sebagai refunded (gunakan status 'refunded')
+        if ($pemesanan->pembayaran) {
+            $pemesanan->pembayaran->update(['status_bayar' => 'refunded']);
+        }
+
+        return redirect()->route('admin.pembatalan')->with('success', 'Refund berhasil diproses.');
     }
 }

@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
 
 // ============ ADMIN / PENGELOLA (affan) ============
 Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
+    Route::get('/', [HomeController::class, 'adminDashboard'])->name('dashboard');
 
     // Venue - Full CRUD
     Route::get('/venue', [VenueController::class, 'index'])->name('venue');
@@ -88,17 +88,22 @@ Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->grou
     Route::put('/lapangan/{id}', [LapanganController::class, 'update'])->name('lapangan.update');
     Route::delete('/lapangan/{id}', [LapanganController::class, 'destroy'])->name('lapangan.destroy');
 
-    Route::get('/jadwal', fn () => view('admin.jadwal'))->name('jadwal');
-    Route::get('/pemesanan', fn () => view('admin.pemesanan'))->name('pemesanan');
-    // Route::get('/pemesanan', [PemesananController::class, 'adminIndex'])->name('pemesanan');
+    Route::get('/jadwal', [HomeController::class, 'adminJadwal'])->name('jadwal');
+    Route::get('/pemesanan', [PemesananController::class, 'adminIndex'])->name('pemesanan');
+    Route::get('/pemesanan/filter', [PemesananController::class, 'adminFilter'])->name('pemesanan.filter');
     Route::get('/verifikasi', [App\Http\Controllers\PembayaranController::class, 'daftarVerifikasi'])->name('verifikasi');
     Route::post('/verifikasi/{id}', [App\Http\Controllers\PembayaranController::class, 'prosesVerifikasi'])->name('verifikasi.proses');
     Route::get('/pembatalan', [PemesananController::class, 'adminPembatalanIndex'])->name('pembatalan');
+    Route::post('/pembatalan/{id}/refund', [PemesananController::class, 'adminProsesRefund'])->name('pembatalan.refund');
+    Route::post('/pemesanan/{id}/batalkan', [PemesananController::class, 'adminBatalkan'])->name('pemesanan.batalkan');
+    Route::get('/profile/edit', [HomeController::class, 'adminProfileEdit'])->name('profile.edit');
+    Route::post('/profile/update', [HomeController::class, 'adminProfileUpdate'])->name('profile.update');
+    Route::post('/profile/rekening', [HomeController::class, 'adminRekeningUpdate'])->name('profile.rekening');
     // Route::get('/verifikasi', fn () => view('admin.verifikasi'))->name('verifikasi');
     // Route::get('/pembatalan', fn () => view('admin.pembatalan'))->name('pembatalan');
-    Route::get('/laporan', fn () => view('admin.laporan'))->name('laporan');
+    Route::get('/laporan', [HomeController::class, 'adminLaporan'])->name('laporan');
     Route::get('/komunikasi', fn () => view('admin.komunikasi'))->name('komunikasi');
-    Route::get('/profile', fn () => view('admin.profile'))->name('profile');
+    Route::get('/profile', [HomeController::class, 'adminProfile'])->name('profile');
 });
 
 // ============ AUTH - LOGGED IN ONLY (sudah login) ============
