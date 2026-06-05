@@ -22,9 +22,8 @@
                 @change="switchFilter()"
                 class="appearance-none border border-gray-200 rounded-lg pl-4 pr-8 py-2 text-sm text-gray-700 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition bg-white min-w-[140px]"
             >
-                <option value="minggu">Minggu Ini</option>
-                <option value="bulan">Bulan Ini</option>
-                <option value="tahun">Tahun Ini</option>
+                <option value="mingguan">7 Hari Terakhir</option>
+                <option value="harian">30 Hari Terakhir</option>
             </select>
             <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" d="M19 9l-7 7-7-7"/>
@@ -35,13 +34,23 @@
     {{-- ============================================================ --}}
     {{-- Stat Cards                                                   --}}
     {{-- ============================================================ --}}
+    @php
+        if ($totalPendapatan >= 1_000_000) {
+            $pendapatanLabel = 'Rp ' . number_format($totalPendapatan / 1_000_000, 1) . ' Jt';
+        } elseif ($totalPendapatan >= 1_000) {
+            $pendapatanLabel = 'Rp ' . number_format($totalPendapatan / 1_000, 0) . ' Rb';
+        } else {
+            $pendapatanLabel = 'Rp ' . number_format($totalPendapatan, 0, ',', '.');
+        }
+    @endphp
+
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
         {{-- Total Pendapatan --}}
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-center justify-between">
             <div>
                 <p class="text-xs text-gray-400 mb-1">Total Pendapatan</p>
-                <p class="text-xl font-bold text-gray-800">65.550.000</p>
+                <p class="text-xl font-bold text-gray-800">{{ $pendapatanLabel }}</p>
             </div>
             <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
                 <span class="text-white text-sm font-bold">Rp</span>
@@ -52,7 +61,7 @@
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-center justify-between">
             <div>
                 <p class="text-xs text-gray-400 mb-1">Total Jam Booking</p>
-                <p class="text-xl font-bold text-gray-800">257</p>
+                <p class="text-xl font-bold text-gray-800">{{ $totalJamBooking }}</p>
             </div>
             <div class="w-10 h-10 bg-green-400 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -65,7 +74,7 @@
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-center justify-between">
             <div>
                 <p class="text-xs text-gray-400 mb-1">Total Pelanggan</p>
-                <p class="text-xl font-bold text-gray-800">471</p>
+                <p class="text-xl font-bold text-gray-800">{{ $totalPelanggan }}</p>
             </div>
             <div class="w-10 h-10 bg-purple-400 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -74,14 +83,16 @@
             </div>
         </div>
 
-        {{-- Okupansi Rata-rata --}}
+        {{-- Total Lapangan --}}
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-center justify-between">
             <div>
-                <p class="text-xs text-gray-400 mb-1">Okupansi Rata-rata</p>
-                <p class="text-xl font-bold text-gray-800">93.5</p>
+                <p class="text-xs text-gray-400 mb-1">Total Lapangan</p>
+                <p class="text-xl font-bold text-gray-800">{{ $rincianLapangan->count() }}</p>
             </div>
             <div class="w-10 h-10 bg-orange-400 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span class="text-white text-sm font-bold">%</span>
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+                </svg>
             </div>
         </div>
 
@@ -95,22 +106,22 @@
         {{-- Tab Buttons --}}
         <div class="flex items-center justify-center gap-6 mb-6">
             <button
-                @click="switchTab('harian')"
-                :class="tab === 'harian'
-                    ? 'bg-purple-700 text-white shadow'
-                    : 'bg-white text-purple-600 border border-purple-300 hover:bg-purple-50'"
-                class="px-10 py-2 rounded-lg text-sm font-semibold transition"
-            >
-                Harian
-            </button>
-            <button
                 @click="switchTab('mingguan')"
                 :class="tab === 'mingguan'
                     ? 'bg-purple-700 text-white shadow'
                     : 'bg-white text-purple-600 border border-purple-300 hover:bg-purple-50'"
                 class="px-10 py-2 rounded-lg text-sm font-semibold transition"
             >
-                Mingguan
+                7 Hari
+            </button>
+            <button
+                @click="switchTab('harian')"
+                :class="tab === 'harian'
+                    ? 'bg-purple-700 text-white shadow'
+                    : 'bg-white text-purple-600 border border-purple-300 hover:bg-purple-50'"
+                class="px-10 py-2 rounded-lg text-sm font-semibold transition"
+            >
+                30 Hari
             </button>
         </div>
 
@@ -131,20 +142,18 @@
                 <div class="relative" style="height: 200px">
                     <canvas id="chartLaku"></canvas>
                 </div>
-                {{-- Legend --}}
+                {{-- Dynamic Legend --}}
                 <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3">
-                    <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-indigo-500 inline-block"></span> Lapangan A (Futsal)
-                    </span>
-                    <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-orange-400 inline-block"></span> Lapangan B (Futsal)
-                    </span>
-                    <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-cyan-400 inline-block"></span> Lapangan C (Badminton)
-                    </span>
-                    <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <span class="w-3 h-3 rounded-sm bg-yellow-400 inline-block"></span> Lapangan D (Basket)
-                    </span>
+                    @foreach($rincianLapangan as $idx => $r)
+                        <span class="flex items-center gap-1.5 text-xs text-gray-500">
+                            <span class="w-3 h-3 rounded-sm inline-block"
+                                  style="background: {{ $lapanganColors[$idx % count($lapanganColors)] }}"></span>
+                            {{ $r->nama }}
+                        </span>
+                    @endforeach
+                    @if($rincianLapangan->isEmpty())
+                        <span class="text-xs text-gray-400">Belum ada data lapangan</span>
+                    @endif
                 </div>
             </div>
 
@@ -172,40 +181,51 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                        $rincian = [
-                            ['nama' => 'Lapangan A (Futsal)',    'total' => 157, 'harga' => 'Rp150.000', 'pendapatan' => 'Rp23.500.000'],
-                            ['nama' => 'Lapangan B (Futsal)',    'total' => 98,  'harga' => 'Rp150.000', 'pendapatan' => 'Rp14.700.000'],
-                            ['nama' => 'Lapangan C (Badminton)', 'total' => 124, 'harga' => 'Rp100.000', 'pendapatan' => 'Rp12.400.000'],
-                            ['nama' => 'Lapangan D (Basket)',    'total' => 79,  'harga' => 'Rp190.000', 'pendapatan' => 'Rp14.950.000'],
-                        ];
-                        @endphp
-                        @foreach($rincian as $r)
+                        @forelse($rincianLapangan as $r)
                         <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                            <td class="px-5 py-3.5 text-gray-700 font-medium">{{ $r['nama'] }}</td>
-                            <td class="px-5 py-3.5 text-gray-600">{{ $r['total'] }}</td>
-                            <td class="px-5 py-3.5 text-gray-600">{{ $r['harga'] }}</td>
-                            <td class="px-5 py-3.5 text-gray-800 font-semibold">{{ $r['pendapatan'] }}</td>
+                            <td class="px-5 py-3.5 text-gray-700 font-medium">{{ $r->nama }}</td>
+                            <td class="px-5 py-3.5 text-gray-600">{{ $r->total_booking ?? 0 }}</td>
+                            <td class="px-5 py-3.5 text-gray-600">Rp {{ number_format($r->harga_sewa, 0, ',', '.') }}</td>
+                            <td class="px-5 py-3.5 text-gray-800 font-semibold">
+                                Rp {{ number_format($r->total_pendapatan ?? 0, 0, ',', '.') }}
+                            </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="4" class="px-5 py-8 text-center text-gray-400 text-sm">
+                                Belum ada data pendapatan
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
 
-        {{-- Rekomendasi Tindakan --}}
+        {{-- Rekomendasi Tindakan (dinamis dari data) --}}
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <h3 class="text-base font-semibold text-gray-800 mb-5">Rekomendasi Tindakan</h3>
+            @php
+                $rekomendasi = [];
+                // Lapangan dengan booking nol → rekomendasikan promosi
+                $lapanganSepi = $rincianLapangan->where('total_booking', 0)->take(2);
+                foreach ($lapanganSepi as $ls) {
+                    $rekomendasi[] = 'Optimalkan promosi untuk ' . $ls->nama . ' (belum ada booking)';
+                }
+                // Lapangan dengan booking terbanyak → pertahankan kualitas
+                $lapanganTop = $rincianLapangan->sortByDesc('total_booking')->first();
+                if ($lapanganTop && $lapanganTop->total_booking > 0) {
+                    $rekomendasi[] = 'Pertahankan kualitas ' . $lapanganTop->nama . ' sebagai lapangan terfavorit';
+                }
+                // Tips umum
+                $rekomendasi = array_merge($rekomendasi, [
+                    'Berikan diskon khusus untuk pemesanan hari kerja guna meningkatkan okupansi',
+                    'Pertimbangkan paket bundling sewa untuk meningkatkan durasi booking',
+                    'Evaluasi jam operasional dan sesuaikan dengan jam puncak pemesanan',
+                ]);
+                $rekomendasi = array_slice($rekomendasi, 0, 5);
+            @endphp
             <ol class="space-y-3">
-                @php
-                $rekomendasi = [
-                    'Optimalisasi Lapangan Futsal',
-                    'Peningkatan Okupansi Lapangan Basket & Badminton',
-                    'Pengembangan Paket Bundling Sewa',
-                    'Evaluasi Jam Operasional Sepi',
-                    'Promosi Khusus Hari Kerja',
-                ];
-                @endphp
                 @foreach($rekomendasi as $i => $r)
                 <li class="flex items-start gap-3">
                     <span class="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">
@@ -221,64 +241,43 @@
 
 </div>
 
-{{-- ============================================================ --}}
-{{-- Alpine Component + Chart.js Logic                            --}}
-{{-- ============================================================ --}}
+{{-- PHP chart data → JS variable --}}
+<script>
+    window.__laporanData = @json($chartDataJson);
+</script>
+
 <script>
 function laporanPage() {
     return {
         tab: 'mingguan',
-        filter: 'minggu',
+        filter: 'mingguan',
         chartTren: null,
         chartLaku: null,
 
-        data: {
-            harian: {
-                labels: Array.from({length: 30}, (_, i) => String(i + 1)),
-                tren:   [12,18,15,22,16,20,19,17,24,20,18,25,22,16,13,20,22,25,18,22,24,22,26,24,20,24,28,22,26,20],
-                laku: {
-                    a: [4,5,3,6,4,5,4,3,6,5,4,6,5,4,3,5,6,7,4,5,6,5,7,6,5,6,7,5,6,5],
-                    b: [3,4,3,5,3,4,3,3,5,4,3,5,4,3,2,4,5,6,3,4,5,4,6,5,4,5,6,4,5,4],
-                    c: [2,3,2,4,2,3,2,2,4,3,2,4,3,2,1,3,4,5,2,3,4,3,5,4,3,4,5,3,4,3],
-                    d: [1,2,1,3,1,2,1,1,3,2,1,3,2,1,1,2,3,4,1,2,3,2,4,3,2,3,4,2,3,2],
-                }
-            },
-            mingguan: {
-                labels: ['1','2','3','4','5'],
-                tren:   [100, 107, 108, 128, 50],
-                laku: {
-                    a: [45, 40, 38, 50, 30],
-                    b: [35, 30, 28, 40, 20],
-                    c: [25, 22, 18, 30, 15],
-                    d: [15, 12, 10, 20, 10],
-                }
-            }
-        },
+        data: window.__laporanData,
 
         init() {
-            this.$nextTick(() => {
-                this.renderCharts();
-            });
+            this.$nextTick(() => { this.renderCharts(); });
         },
 
         switchTab(newTab) {
             this.tab = newTab;
+            this.filter = newTab;
             this.$nextTick(() => this.updateCharts());
         },
 
         switchFilter() {
-            // In real app, would fetch new data based on filter
-            // Here we just toggle between harian/mingguan visual
+            this.tab = this.filter;
+            this.$nextTick(() => this.updateCharts());
         },
 
         currentData() {
-            return this.data[this.tab];
+            return this.data[this.tab] || this.data['mingguan'];
         },
 
         renderCharts() {
             const d = this.currentData();
 
-            // --- Line Chart: Tren ---
             const ctxTren = document.getElementById('chartTren');
             if (!ctxTren) return;
             this.chartTren = new Chart(ctxTren, {
@@ -286,7 +285,7 @@ function laporanPage() {
                 data: {
                     labels: d.labels,
                     datasets: [{
-                        label: 'Lapangan',
+                        label: 'Total Booking',
                         data: d.tren,
                         borderColor: 'rgb(109, 40, 217)',
                         backgroundColor: 'rgba(109, 40, 217, 0.05)',
@@ -302,11 +301,7 @@ function laporanPage() {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: { font: { size: 10 }, boxWidth: 12 }
-                        },
+                        legend: { display: true, position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } },
                         tooltip: { mode: 'index', intersect: false }
                     },
                     scales: {
@@ -316,20 +311,11 @@ function laporanPage() {
                 }
             });
 
-            // --- Bar Chart: Lapangan Paling Laku ---
             const ctxLaku = document.getElementById('chartLaku');
             if (!ctxLaku) return;
             this.chartLaku = new Chart(ctxLaku, {
                 type: 'bar',
-                data: {
-                    labels: d.labels,
-                    datasets: [
-                        { label: 'Lapangan A (Futsal)',    data: d.laku.a, backgroundColor: 'rgb(99,102,241)',  borderRadius: 2 },
-                        { label: 'Lapangan B (Futsal)',    data: d.laku.b, backgroundColor: 'rgb(251,146,60)',  borderRadius: 2 },
-                        { label: 'Lapangan C (Badminton)', data: d.laku.c, backgroundColor: 'rgb(34,211,238)',  borderRadius: 2 },
-                        { label: 'Lapangan D (Basket)',    data: d.laku.d, backgroundColor: 'rgb(251,191,36)',  borderRadius: 2 },
-                    ]
-                },
+                data: { labels: d.labels, datasets: d.datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -349,17 +335,12 @@ function laporanPage() {
             const d = this.currentData();
             if (!this.chartTren || !this.chartLaku) return;
 
-            // Update Tren chart
             this.chartTren.data.labels = d.labels;
             this.chartTren.data.datasets[0].data = d.tren;
             this.chartTren.update();
 
-            // Update Laku chart
             this.chartLaku.data.labels = d.labels;
-            this.chartLaku.data.datasets[0].data = d.laku.a;
-            this.chartLaku.data.datasets[1].data = d.laku.b;
-            this.chartLaku.data.datasets[2].data = d.laku.c;
-            this.chartLaku.data.datasets[3].data = d.laku.d;
+            this.chartLaku.data.datasets = d.datasets;
             this.chartLaku.update();
         }
     }
