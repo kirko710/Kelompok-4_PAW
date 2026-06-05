@@ -79,10 +79,6 @@ class GuestController extends Controller
         return view('guest.venue-detail', compact('venue', 'lapangan'));
     }
 
-    /**
-     * API endpoint: kembalikan slot ketersediaan untuk lapangan pada tanggal tertentu.
-     * GET /lapangan/{id}/slots?tanggal=YYYY-MM-DD
-     */
     public function getSlots(Request $request, int $id)
     {
         $lapangan = Lapangan::findOrFail($id);

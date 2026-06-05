@@ -10,11 +10,6 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-/* ============================================
-   app.css — Courtee Global Stylesheet
-   ============================================ */
-
-/* --- 1. CSS Variables --- */
 :root {
     --brand-primary:    #9957B3;
     --brand-dark:       #4D2D6C;

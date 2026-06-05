@@ -381,7 +381,6 @@ function updateSummary(lapanganId, tanggal) {
     summary.classList.add('visible');
 }
 
-// Toast notification sederhana
 let toastTimeout;
 function showToast(msg) {
     let toast = document.getElementById('courtee-toast');

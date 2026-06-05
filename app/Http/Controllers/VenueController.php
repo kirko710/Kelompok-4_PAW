@@ -121,7 +121,7 @@ class VenueController extends Controller
             }
         }
 
-        $venue->delete(); // SoftDelete → cascade handled by DB
+        $venue->delete(); 
 
         return redirect()->route('admin.venue')->with('success', 'Venue berhasil dihapus!');
     }

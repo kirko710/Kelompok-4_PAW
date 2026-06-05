@@ -9,17 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 class PembayaranController extends Controller
 {
-    /**
-     * ==========================================
-     * FITUR UNTUK PENYEWA (USER)
-     * ==========================================
-     */
-
     // Menampilkan halaman form pembayaran untuk penyewa
     public function show(Request $request, $id_pemesanan)
     {
-        // Mencari data pembayaran berdasarkan ID pemesanan.
-        // Relasi dan validasi Auth::id() digunakan agar user lain tidak bisa melihat pembayaran yang bukan miliknya.
         $pembayaran = Pembayaran::with('pemesanan.lapangan')
             ->where('id_pemesanan', $id_pemesanan)
             ->whereHas('pemesanan', function ($query) {
@@ -64,24 +56,17 @@ class PembayaranController extends Controller
             'nomor_referensi'    => $request->nomor_referensi,
             'catatan'            => $request->catatan,
             'status_bayar'       => 'pending',
-            'tanggal_pembayaran' => now(), // Mencatat waktu submit
+            'tanggal_pembayaran' => now(),
         ]);
 
         return redirect()->route('home')->with('success', 'Pembayaran berhasil dikirim dan sedang menunggu verifikasi.');
     }
 
-
-    /**
-     * ==========================================
-     * FITUR UNTUK ADMIN / OWNER
-     * ==========================================
-     */
-
     // Menampilkan halaman daftar pembayaran yang butuh diverifikasi admin
     public function daftarVerifikasi()
     {
         $pemesanans = Pemesanan::with(['user', 'lapangan', 'pembayaran'])
-            ->whereHas('pembayaran', fn($q) => $q->where('status_bayar', 'pending'))
+            ->whereHas('pembayaran', fn($q) => $q->where('status_bayar', ['pending', 'unpaid']))
             ->whereHas('lapangan.venue', fn($q) => $q->where('id_user', Auth::id()))
             ->latest()
             ->get();
@@ -92,7 +77,6 @@ class PembayaranController extends Controller
     // Memproses verifikasi (Terima/Tolak) oleh Admin
     public function prosesVerifikasi(Request $request, $id)
     {
-        // Support both 'aksi' and 'action' field names
         $aksi = $request->input('action', $request->input('aksi'));
 
         $pemesanan  = Pemesanan::findOrFail($id);

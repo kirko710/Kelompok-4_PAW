@@ -41,8 +41,8 @@ class PemesananController extends Controller
 
         Pembayaran::create([
             'id_pemesanan'      => $pemesanan->id,
-            'metode_pembayaran' => 'transfer_bank', // Default, bisa diubah user nanti
-            'status_bayar'      => 'unpaid',
+            'metode_pembayaran' => 'transfer_bank',
+            'status_bayar'      => 'pending',
         ]);
 
         return redirect()->route('pemesanan.detail', ['id' => $pemesanan->id])
@@ -144,12 +144,6 @@ class PemesananController extends Controller
 
         return view('penyewa.riwayat', compact('riwayat', 'currentStatus'));
     }
-
-    /**
-     * ==========================================
-     * FITUR UNTUK ADMIN / OWNER
-     * ==========================================
-     */
 
     // Menampilkan semua daftar pemesanan (Riwayat Keseluruhan)
     public function adminIndex()

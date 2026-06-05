@@ -36,6 +36,10 @@
     width: 100%; padding: 14px; margin-top: 16px; border: 1px solid var(--stroke-secondary);
     border-radius: 8px; font-family: var(--font-base);
 }
+#notif-container {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; background: white; padding: 24px;
+    border-radius: 12px; box-shadow: 0px 12px 16px -4px rgba(52, 64, 84, 0.12); display: flex; align-items: center; gap: 16px;
+}
 </style>
 @endpush
 
@@ -88,12 +92,12 @@
     @if($metode === 'qris')
         <div class="qr-container">
             <div class="qr-box">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="QRIS" style="width: 100%; height: 100%; padding: 16px;">
+            <img src="{{ asset('qrcode/qr-code.png') }}" alt="QRIS" style="width: 100%; height: 100%; padding: 16px;">
             </div>
-            <button class="download-qr">
+            <a href="{{ asset('qrcode/qr-code.png') }}" id="download-qr" class="download-qr" download="qris-code.png">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Download QR
-            </button>
+            </a>
         </div>
 
         <div class="guide">
@@ -183,5 +187,42 @@
         el.textContent = "Kedaluwarsa";
     }
 </script>
+<script>
+    document.getElementById('download-qr').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const link = document.createElement('a');
+    link.href = this.href;
+    link.download = 'qris-code.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+</script>
+<script>
+document.querySelector('.btn-cta').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const notifContainer = document.getElementById('notif-container');
+    notifContainer.style.display = 'flex';
+
+    setTimeout(() => {
+        notifContainer.style.display = 'none'; 
+        window.location.href = "{{ route('home') }}";
+    }, 2500);
+});
+</script>
 @endpush
 @endsection
+
+<div id="notif-container" class="hidden" style="display: none;">
+    <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
+        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+    </div>
+    <div>
+        <p class="text-sm font-semibold text-green-600">Order anda berhasil diproses!</p>
+        <p class="text-sm text-gray-600">Anda akan diarahkan ke home. Anda dapat mengakses dashboard untuk mengecek pesanan.</p>
+    </div>
+</div>

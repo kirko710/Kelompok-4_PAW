@@ -7,59 +7,37 @@
     .page-title { font-size: 28px; font-weight: 700; color: var(--brand-primary); margin-bottom: 8px; }
     .page-subtitle { color: var(--text-secondary); margin-bottom: 32px; font-size: 15px; }
 
-    /* Filter Styles */
-    .filter-wrapper { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; scrollbar-width: none; }
-    .filter-wrapper::-webkit-scrollbar { display: none; }
-    .filter-btn {
-        padding: 8px 20px; border-radius: 20px; border: 1px solid var(--stroke-secondary);
-        background: #fff; color: var(--text-secondary); font-size: 14px; font-weight: 500;
-        cursor: pointer; white-space: nowrap; transition: 0.3s;
-    }
+    .filter-wrapper { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
+    .filter-btn { padding: 8px 20px; border-radius: 20px; border: 1px solid var(--stroke-secondary); background: #fff; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: 0.3s; }
     .filter-btn.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
 
-    /* Card Styles */
-    .booking-card {
-        background: #fff; border: 1px solid var(--stroke-secondary); border-radius: 16px;
-        padding: 20px; margin-bottom: 20px; transition: transform 0.2s;
-    }
+    .booking-card { background: #fff; border: 1px solid var(--stroke-secondary); border-radius: 16px; padding: 20px; margin-bottom: 20px; transition: transform 0.2s; }
     .booking-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-    
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-    .venue-info { display: flex; gap: 16px; align-items: center; }
-    .venue-icon { 
-        width: 48px; height: 48px; background: #f3e8ff; border-radius: 12px; 
-        display: flex; align-items: center; justify-content: center; color: var(--brand-primary);
-    }
-    .venue-name { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
-    .court-name { font-size: 13px; color: var(--text-secondary); }
 
-    /* Badges */
-    .badge { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
-    .badge-pending { background: #fef3c7; color: #d97706; }    /* Kuning */
-    .badge-confirmed { background: #dcfce7; color: #16a34a; }  /* Hijau */
-    .badge-completed { background: #eff6ff; color: #1d4ed8; }  /* Biru */
-    .badge-cancelled { background: #fee2e2; color: #dc2626; }  /* Merah */
+    .card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+    .venue-info { display:flex; gap:16px; align-items:center; }
+    .venue-icon { width:48px; height:48px; background:#f3e8ff; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--brand-primary); }
+    .venue-name { font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:2px; }
+    .court-name { font-size:13px; color:var(--text-secondary); }
 
-    .card-body { 
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-        gap: 16px; padding: 16px 0; border-top: 1px dashed var(--stroke-secondary);
-        border-bottom: 1px dashed var(--stroke-secondary);
-    }
-    .info-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-    .info-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .badge { padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; text-transform:capitalize; }
+    .badge-pending { background:#fef3c7; color:#d97706; }
+    .badge-confirmed { background:#dcfce7; color:#16a34a; }
+    .badge-completed { background:#eff6ff; color:#1d4ed8; }
+    .badge-cancelled { background:#fee2e2; color:#dc2626; }
 
-    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
-    .total-price { font-size: 14px; color: var(--text-secondary); }
-    .total-price strong { font-size: 18px; color: var(--brand-primary); margin-left: 4px; }
-    
-    .action-btns { display: flex; gap: 8px; }
-    .btn-sm { 
-        padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; 
-        cursor: pointer; border: none; transition: 0.3s; text-decoration: none;
-    }
-    .btn-outline { border: 1px solid var(--stroke-secondary); background: #fff; color: var(--text-secondary); }
-    .btn-primary-sm { background: var(--brand-primary); color: #fff; }
-    .btn-outline:hover { background: #f9fafb; }
+    .card-body { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:16px; padding:16px 0; border-top:1px dashed var(--stroke-secondary); border-bottom:1px dashed var(--stroke-secondary); }
+
+    .card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
+    .total-price { font-size:14px; color:var(--text-secondary); }
+    .action-btns { display:flex; gap:8px; }
+
+    .btn-sm { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; text-decoration:none; }
+    .btn-outline { border:1px solid var(--stroke-secondary); background:#fff; color:var(--text-secondary); }
+    .btn-primary-sm { background:var(--brand-primary); color:#fff; }
+
+    .booking-item { display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid #f3f4f6; }
+    .booking-item:last-child { border-bottom:none; }
 </style>
 @endpush
 
@@ -151,100 +129,4 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const container = document.getElementById('riwayatContainer');
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const url = btn.href;
-
-            container.innerHTML = '<div style="text-align: center; padding: 60px 0; color: #666;">Sedang memuat data...</div>';
-
-            try {
-                const response = await fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const result = await response.json();
-                const data = result.data;
-                let htmlContent = '';
-
-                if (data.length === 0) {
-                    htmlContent = `
-                    <div style="text-align: center; padding: 60px 0;">
-                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-2130356-1800917.png" alt="Empty" style="width: 200px; opacity: 0.5;">
-                        <p style="color: var(--text-secondary); margin-top: 20px;">Belum ada riwayat pemesanan untuk status ini.</p>
-                    </div>`;
-                } else {
-                    data.forEach(item => {
-                        let actionButtons = `<a href="${item.detail_url}" class="btn-sm btn-outline">Detail</a>&nbsp;`;
-                        
-                        if (item.status_pesanan === 'pending') {
-                            actionButtons += `<a href="${item.bayar_url}" class="btn-sm btn-primary-sm">Bayar Sekarang</a>`;
-                        }
-
-                        htmlContent += `
-                        <div class="booking-card">
-                            <div class="card-header">
-                                <div class="venue-info">
-                                    <div class="venue-icon">
-                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11m16-11v11"/></svg>
-                                    </div>
-                                    <div>
-                                        <div class="venue-name">${item.venue_nama}</div>
-                                        <div class="court-name">${item.lapangan_nama}</div>
-                                    </div>
-                                </div>
-                                <span class="badge badge-${item.status_pesanan}">${item.status_text}</span>
-                            </div>
-
-                            <div class="card-body">
-                                <div>
-                                    <div class="info-label">Tanggal Main</div>
-                                    <div class="info-value">${item.tanggal_main}</div>
-                                </div>
-                                <div>
-                                    <div class="info-label">Waktu</div>
-                                    <div class="info-value">${item.waktu_mulai} - ${item.waktu_selesai}</div>
-                                </div>
-                                <div>
-                                    <div class="info-label">ID Pesanan</div>
-                                    <div class="info-value">${item.id_pesanan_format}</div>
-                                </div>
-                            </div>
-
-                            <div class="card-footer">
-                                <div class="total-price">
-                                    Total: <strong>Rp ${item.total_harga_format}</strong>
-                                </div>
-                                <div class="action-btns">
-                                    ${actionButtons}
-                                </div>
-                            </div>
-                        </div>
-                        `;
-                    });
-                }
-
-                container.innerHTML = htmlContent;
-                window.history.pushState({}, '', url);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                container.innerHTML = '<div style="text-align: center; padding: 60px 0; color: red;">Gagal memuat data. Silakan coba lagi.</div>';
-            }
-        });
-    });
-});
-</script>
-@endpush
+<script src="{{ asset('js/riwayat.js') }}" defer></script>
