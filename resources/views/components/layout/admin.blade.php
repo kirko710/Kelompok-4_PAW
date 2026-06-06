@@ -103,7 +103,7 @@
                         </svg>
                     </button>
                     <div class="flex items-center gap-3">
-                        <img src="https://ui-avatars.com/api/?name=Saipul+Alexander&background=7e22ce&color=fff" alt="Avatar" class="w-9 h-9 rounded-full">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=7e22ce&color=fff" alt="Avatar" class="w-9 h-9 rounded-full">
                         <div class="text-right">
                             <div class="text-sm font-semibold text-gray-800 leading-tight">
                                 {{ Auth::user()->name ?? 'Admin' }}

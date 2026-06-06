@@ -1,6 +1,3 @@
-{{-- Chart.js CDN --}}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <x-layout.admin title="Laporan & Analitik" activeMenu="admin.laporan" breadcrumb="Dashboard > Laporan & Analitik">
 
 <div x-data="laporanPage()" x-init="init()">
@@ -246,6 +243,8 @@
     window.__laporanData = @json($chartDataJson);
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script>
 function laporanPage() {
     return {
@@ -256,8 +255,25 @@ function laporanPage() {
 
         data: window.__laporanData,
 
+        // ----------------------------------------------------------------
+        // init: tunggu Chart.js benar-benar ready sebelum render
+        // ----------------------------------------------------------------
         init() {
-            this.$nextTick(() => { this.renderCharts(); });
+            this.$nextTick(() => { this.waitForChart(0); });
+        },
+
+        // Polling hingga Chart global tersedia & canvas ada di DOM
+        waitForChart(attempt) {
+            if (typeof Chart !== 'undefined'
+                && document.getElementById('chartTren')
+                && document.getElementById('chartLaku')) {
+                this.renderCharts();
+            } else if (attempt < 50) {
+                // Retry tiap 100ms, maks 5 detik
+                setTimeout(() => this.waitForChart(attempt + 1), 100);
+            } else {
+                console.warn('[LaporanPage] Chart.js atau canvas tidak ditemukan setelah 5 detik.');
+            }
         },
 
         switchTab(newTab) {
@@ -278,8 +294,13 @@ function laporanPage() {
         renderCharts() {
             const d = this.currentData();
 
+            // ── Grafik Tren Penyewaan (Line) ──────────────────────────────
             const ctxTren = document.getElementById('chartTren');
             if (!ctxTren) return;
+
+            // Destroy instance lama agar tidak terjadi error "Canvas already in use"
+            if (this.chartTren) { this.chartTren.destroy(); this.chartTren = null; }
+
             this.chartTren = new Chart(ctxTren, {
                 type: 'line',
                 data: {
@@ -311,8 +332,13 @@ function laporanPage() {
                 }
             });
 
+            // ── Grafik Lapangan Paling Laku (Bar) ─────────────────────────
             const ctxLaku = document.getElementById('chartLaku');
             if (!ctxLaku) return;
+
+            // Destroy instance lama
+            if (this.chartLaku) { this.chartLaku.destroy(); this.chartLaku = null; }
+
             this.chartLaku = new Chart(ctxLaku, {
                 type: 'bar',
                 data: { labels: d.labels, datasets: d.datasets },
@@ -331,17 +357,15 @@ function laporanPage() {
             });
         },
 
+        // ----------------------------------------------------------------
+        // updateCharts: destroy + recreate agar tidak ada instance leak
+        // ----------------------------------------------------------------
         updateCharts() {
-            const d = this.currentData();
-            if (!this.chartTren || !this.chartLaku) return;
+            // Destroy dulu sebelum recreate
+            if (this.chartTren) { this.chartTren.destroy(); this.chartTren = null; }
+            if (this.chartLaku) { this.chartLaku.destroy(); this.chartLaku = null; }
 
-            this.chartTren.data.labels = d.labels;
-            this.chartTren.data.datasets[0].data = d.tren;
-            this.chartTren.update();
-
-            this.chartLaku.data.labels = d.labels;
-            this.chartLaku.data.datasets = d.datasets;
-            this.chartLaku.update();
+            this.renderCharts();
         }
     }
 }
